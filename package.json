@@ -1,0 +1,24 @@
+{
+  "name": "blog",
+  "module": "index.ts",
+  "type": "module",
+  "private": true,
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "scripts": {
+    "build": "bun run src/main.ts build --profile",
+    "watch": "rm -rf ./out && bun run src/main.ts watch",
+    "serve": "bun run watch & live-server ./out/www --host=127.0.0.1 --port=3030",
+    "touch": "bun run src/main.ts touch"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@djot/djot": "^0.3.2",
+    "highlight.js": "^11.11.1",
+    "rss-parser": "^3.13.0",
+    "ws": "^8.18.2"
+  }
+}
