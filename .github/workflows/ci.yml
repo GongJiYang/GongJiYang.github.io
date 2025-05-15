@@ -2,8 +2,7 @@ name: CI
 on:
   push:
     branches:
-    - master
-
+      - main
   schedule:
     - cron: "0 0 * * *"
 
@@ -13,14 +12,11 @@ jobs:
     permissions:
       pages: write
       id-token: write
-
-steps:
-    - uses: actions/checkout@v4
-    - uses: oven-sh/setup-bun@v2
-
-    - run: bun run build --blogroll
-
-    - uses: actions/upload-pages-artifact@v3
-      with:
-      path: ./out/www
-    - uses: actions/deploy-pages@v4
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+      - run: bun run build --blogroll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./out/www
+      - uses: actions/deploy-pages@v4
