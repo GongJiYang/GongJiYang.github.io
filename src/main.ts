@@ -11,6 +11,9 @@ import * as djot from "./djot.ts";
 import { WebSocketServer } from "ws";
 
 let wss: WebSocketServer | undefined;
+let devServer: Bun.Server | undefined;
+
+const OUT_ROOT = path.resolve("./out/www");
 
 async function main() {
   // 定义命令行数据
@@ -87,76 +90,143 @@ function fatal(message: string) {
 }
 
 async function watch(params: { filter: string }) {
-  // 默认处于等待状态
-  // 手动 signal.resolve() 时，触发 build()
-  // 每次 build() 结束后，重新等待下一个 signal.resolve()
-  let signal = Promise.withResolvers();
-  (async () => {
-    let build_id = 0; //记录重构次数
-    while (await signal.promise) {
-      signal = Promise.withResolvers();
-      console.log(`rebuild #${build_id}`);
-      build_id += 1;
-      await build({
-        blogroll: true,
-        update: true,
-        spell: false,
-        profile: false,
-        filter: params.filter,
-      });
+  let signal = Promise.withResolvers<boolean>();
+  let building = false;
+  let pendingBuild = false;
+
+  const triggerRebuild = () => {
+    if (building) {
+      pendingBuild = true;
+      return;
     }
-  })();
+    signal.resolve(true);
+  };
 
-  signal.resolve(true);
+  const rebuild_debounced = debounce(triggerRebuild, 16);
 
-  // 确保 signal.resolve(true) 只在最后一次调用后的 16ms 执行
-  // 如果 16ms 内有新的调用，就会取消前一个调用，重新计时。
-  const rebuild_debounced = debounce(
-    () => signal.resolve(true),
-    16,
-  );
-
-  // 监听 ./content
   fsWatch("./content", { recursive: true }, (eventType, filename) => {
     console.log(`File event: ${eventType} on ${filename}`);
     if (!filename) return;
     if (eventType === "rename" || eventType === "change") {
-      rebuild_debounced(); // 触发防抖构建，防止短时间内重复触发 rebuild()
+      rebuild_debounced();
     }
   });
 
-  //启动 websocket 服务器
-  if (!wss) {
+  const useWsReload = process.env.LIVE_RELOAD_WS === "1";
+  if (useWsReload && !wss) {
     wss = new WebSocketServer({ port: 35729 });
+    wss.on("error", (error) => {
+      console.warn("WebSocket server unavailable on port 35729, continuing without live reload:", error);
+      wss = undefined;
+    });
     console.log("WebSocket server started on ws://localhost:35729");
   }
 
-  (async () => {
-    let build_id = 0;
-    while (await signal.promise) {
-      signal = Promise.withResolvers();
-      console.log(`rebuild #${build_id}`);
-      build_id += 1;
-      await build({
-        blogroll: false,
-        update: true,
-        spell: false,
-        profile: false,
-        filter: params.filter,
-      });
-      // 构建完成后通知所有客户端刷新
-      wss?.clients.forEach(ws => ws.send("reload"));
-    }
-  })();
+  startDevServer();
+  signal.resolve(true);
 
+  let build_id = 0;
+  while (await signal.promise) {
+    signal = Promise.withResolvers<boolean>();
+    building = true;
+    console.log(`rebuild #${build_id}`);
+    build_id += 1;
+    await build({
+      blogroll: true,
+      update: true,
+      spell: false,
+      profile: false,
+      filter: params.filter,
+    });
+    building = false;
+    if (wss) wss.clients.forEach(ws => ws.send("reload"));
+
+    if (pendingBuild) {
+      pendingBuild = false;
+      signal.resolve(true);
+    }
+  }
 }
 
 function debounce(fn: () => void, delay: number) {
   let timer: ReturnType<typeof setTimeout>;
-  return () => { //给fn传参数
-    clearTimeout(timer); //每次调用 debounce() 返回的函数时，都清除上一次 setTimeout
+  return () => {
+    clearTimeout(timer);
     timer = setTimeout(fn, delay);
   };
+}
+
+function staticCandidates(pathname: string): string[] {
+  let decoded = pathname;
+  try {
+    decoded = decodeURIComponent(pathname);
+  } catch {
+    return [];
+  }
+
+  if (decoded === "/") return ["index.html"];
+
+  const cleaned = decoded.replace(/^\/+/, "");
+  const candidates = new Set<string>();
+
+  if (decoded.endsWith("/")) {
+    candidates.add(path.join(cleaned, "index.html"));
+  } else {
+    candidates.add(cleaned);
+    if (!path.extname(cleaned)) {
+      candidates.add(path.join(cleaned, "index.html"));
+      candidates.add(`${cleaned}.html`);
+    }
+  }
+
+  return [...candidates].map((candidate) => path.normalize(candidate));
+}
+
+async function serveStatic(pathname: string, method: string): Promise<Response> {
+  const candidates = staticCandidates(pathname);
+  for (const candidate of candidates) {
+    const fullPath = path.resolve(OUT_ROOT, candidate);
+    const insideOut = fullPath === OUT_ROOT || fullPath.startsWith(`${OUT_ROOT}${path.sep}`);
+    if (!insideOut) continue;
+
+    try {
+      const stat = await fspromise.stat(fullPath);
+      if (!stat.isFile()) continue;
+      const body = method === "HEAD" ? null : Bun.file(fullPath);
+      return new Response(body, {
+        status: 200,
+      });
+    } catch {
+      continue;
+    }
+  }
+
+  return new Response("Not Found", { status: 404 });
+}
+
+function startDevServer() {
+  if (devServer) return;
+
+  const envPort = Number(process.env.PORT ?? "3030");
+  const port = Number.isFinite(envPort) && envPort > 0 ? envPort : 3030;
+
+  devServer = Bun.serve({
+    hostname: "127.0.0.1",
+    port,
+    fetch: async (request) => {
+      const { pathname } = new URL(request.url);
+
+      if (request.method !== "GET" && request.method !== "HEAD") {
+        return new Response("Method Not Allowed", { status: 405 });
+      }
+
+      return serveStatic(pathname, request.method);
+    },
+  });
+
+  console.log(`Dev server started at http://${devServer.hostname}:${devServer.port}`);
+  console.log("Set PORT=xxxx to override default 3030 if needed.");
+  console.log("Set LIVE_RELOAD_WS=1 to enable ws://localhost:35729 reload channel.");
 }
 
 // 记录博客构建过程中的各个阶段耗时
@@ -233,7 +303,7 @@ async function build(params: {
         console.log("blogroll_posts.length =", blogroll_posts.length);
         await update_file(
           `out/www${prefix}/blogroll.html`,
-          templates.blogroll_list(blogroll_posts).value,
+          templates.blogroll_list(blogroll_posts, lang).value,
         );
         console.log(`Generated out/www${prefix}/blogroll.html`);
       } catch (err) {
@@ -249,6 +319,9 @@ async function build(params: {
       const html = djot.render(ast, {});
       await update_file(`out/www${prefix}/${page}.html`, templates.page(page, html, lang).value);
     }
+
+    // 在线写作页面
+    await update_file(`out/www${prefix}/write/index.html`, templates.write_page(lang).value);
   }
   // 复制静态资源
   const paths = [

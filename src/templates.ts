@@ -6,12 +6,12 @@ type Language = "en" | "zh";
 const site_url = "https://matklad.github.io";
 // 中英切换
 const LANG_KEY = 'site_language';
-const navTexts: Record<Language, { about: string; blogroll: string; home: string; switchLang: string }> = {
-  en: { home: "Home", about: "About", blogroll: "Blogroll", switchLang: "中" },
-  zh: { home: "首页", about: "关于", blogroll: "博客列表", switchLang: "EN" },
+const navTexts: Record<Language, { about: string; blogroll: string; home: string; write: string; switchLang: string }> = {
+  en: { home: "Home", about: "About", blogroll: "Blogroll", write: "Write", switchLang: "中" },
+  zh: { home: "首页", about: "关于", blogroll: "博客列表", write: "写作", switchLang: "EN" },
 };
 export const base = (
-  { content, src, title, path, description, extra_css, showLangSwitch = false }: {
+  { content, src, title, path, description, extra_css, showLangSwitch = false, showEditLink = true }: {
     content: HtmlString;
     src: string;
     title: string;
@@ -19,6 +19,7 @@ export const base = (
     path: string;
     extra_css?: string;
     showLangSwitch?: boolean;
+    showEditLink?: boolean;
   },
   lang: Language = "en"
 ): HtmlString =>
@@ -93,11 +94,12 @@ export const base = (
 <body>
   <header>
     <nav>
-      <a class="title" href="/">${navTexts[lang].home}</a>
-      <a href="/about.html">${navTexts[lang].about}</a>
-      <a href="/blogroll.html">${navTexts[lang].blogroll}</a>
+      <a class="title" href="${lang === "en" ? "/" : "/CN/"}">${navTexts[lang].home}</a>
+      <a href="${lang === "en" ? "/about.html" : "/CN/about.html"}">${navTexts[lang].about}</a>
+      <a href="${lang === "en" ? "/blogroll.html" : "/CN/blogroll.html"}">${navTexts[lang].blogroll}</a>
+      <a href="${lang === "en" ? "/write/" : "/CN/write/"}">${navTexts[lang].write}</a>
       ${showLangSwitch ? html`
-      <a href="${lang === 'en' ? '/CN' + path : path.replace(/^\/CN/, '') || '/'}">
+      <a id="lang-switch" href="${lang === 'en' ? '/CN' + path : path.replace(/^\/CN/, '') || '/'}" data-lang="${lang === "en" ? "zh" : "en"}">
         ${navTexts[lang].switchLang}
       </a>
       ` : ""}
@@ -110,10 +112,12 @@ export const base = (
 
   <footer>
     <p>
-      <a href="https://github.com/matklad/matklad.github.io/edit/master${src}">
+      ${showEditLink ? html`
+      <a href="https://github.com/GongJiYang/GongJiYang.github.io/edit/main${src}">
         <svg class="icon"><use href="/assets/icons.svg#edit"/></svg>
-        Fix typo
+        Edit this post
       </a>
+      ` : ""}
       <a href="/feed.xml">
         <svg class="icon"><use href="/assets/icons.svg#rss"/></svg>
         Subscribe
@@ -132,25 +136,28 @@ export const base = (
 <script>
   (function() {
       const LANG_KEY = '${LANG_KEY}';
-      const switchBtn = document.getElementById('lang-switch');
-      if (!switchBtn) return;
+      const switchEl = document.getElementById('lang-switch');
+      if (switchEl instanceof HTMLAnchorElement) {
+        switchEl.addEventListener('click', function() {
+          const nextLang = switchEl.dataset.lang;
+          if (nextLang === 'en' || nextLang === 'zh') {
+            localStorage.setItem(LANG_KEY, nextLang);
+          }
+        });
+      }
 
-      switchBtn.addEventListener('click', () => {
-        const currentLang = localStorage.getItem(LANG_KEY) || 'en';
-        const newLang = currentLang === 'en' ? 'zh' : 'en';
-        localStorage.setItem(LANG_KEY, newLang);
-        location.reload();
-      });
+      const pathLang = location.pathname.startsWith('/CN') ? 'zh' : 'en';
+      let savedLang = localStorage.getItem(LANG_KEY);
+      if (savedLang !== 'en' && savedLang !== 'zh') {
+        savedLang = pathLang;
+        localStorage.setItem(LANG_KEY, savedLang);
+      }
 
-      // 页面加载时自动根据 localStorage 设置 lang，若不符则跳转
-      const savedLang = localStorage.getItem(LANG_KEY) || 'en';
-      if (savedLang !== '${lang}') {
-        // 如果页面语言和存储语言不一致，跳转到对应语言页面
-        //  / 和 /CN 两个路径区分语言
+      if (savedLang !== pathLang) {
         if (savedLang === 'zh' && !location.pathname.startsWith('/CN')) {
           location.pathname = '/CN' + location.pathname;
         } else if (savedLang === 'en' && location.pathname.startsWith('/CN')) {
-          location.pathname = location.pathname.replace(/^\/CN/, '') || '/';
+          location.pathname = location.pathname.replace(/^\\/CN/, '') || '/';
         }
       }
     })();
@@ -160,8 +167,9 @@ export const base = (
 const blurb = "Yet another programming blog by Alex Kladov aka matklad.";
 
 export function page(name: string, content: HtmlString, lang: "en" | "zh") {
+  const prefix = lang === "en" ? "" : "/CN";
   return base({
-    path: `/${name}`,
+    path: `${prefix}/${name}.html`,
     title: "Jay67",
     description: blurb,
     src: `/content/${name}.dj`,
@@ -169,6 +177,420 @@ export function page(name: string, content: HtmlString, lang: "en" | "zh") {
     content,
   }, lang);
 }
+
+export const write_page = (lang: "en" | "zh"): HtmlString => {
+  const text = {
+    en: {
+      title: "Write",
+      pageTitle: "Write a post",
+      description: "Write in live-render mode and publish via GitHub Issue.",
+      postTitle: "Title",
+      titlePlaceholder: "Post title",
+      slug: "Slug",
+      date: "Date",
+      language: "Language",
+      insertImage: "Insert image",
+      publish: "Publish via GitHub Issue",
+      fillAll: "Please fill title, slug, date and body.",
+      badSlug: "Slug must contain only lowercase letters, numbers and '-'.",
+      badDate: "Date must be in YYYY-MM-DD format.",
+      publishConfirm: "Open GitHub Issue to publish this post?",
+      intro: "Top area holds metadata; body area is live-render editor.",
+      placeholder: "Start writing your Djot/Markdown post here...",
+      imagePrompt: "Image path under /assets (example: /assets/demo.png):",
+      fallbackNotice: "Live editor failed to load, switched to plain editor.",
+      openingIssue: "Opening GitHub Issue...",
+      issueOpened: "Issue form opened in a new tab.",
+      issueOpenFailed: "Failed to open GitHub Issue.",
+    },
+    zh: {
+      title: "写作",
+      pageTitle: "在线写博客",
+      description: "类似 Obsidian 的单栏实时渲染写作，完成后通过 GitHub Issue 发布。",
+      postTitle: "标题",
+      titlePlaceholder: "输入文章标题",
+      slug: "Slug",
+      date: "日期",
+      language: "语言",
+      insertImage: "插入图片",
+      publish: "通过 GitHub Issue 发布",
+      fillAll: "请填写标题、slug、日期和正文。",
+      badSlug: "Slug 只能包含小写字母、数字和连字符。",
+      badDate: "日期格式需为 YYYY-MM-DD。",
+      publishConfirm: "确认打开 GitHub Issue 发布吗？",
+      intro: "顶部是元信息，正文区是实时渲染编辑器。",
+      placeholder: "在这里开始写 Djot/Markdown 正文...",
+      imagePrompt: "输入 /assets 下的图片路径（例如：/assets/demo.png）：",
+      fallbackNotice: "实时编辑器加载失败，已切换到纯文本编辑器。",
+      openingIssue: "正在打开 GitHub Issue...",
+      issueOpened: "已在新标签页打开 Issue 表单。",
+      issueOpenFailed: "打开 GitHub Issue 失败。",
+    },
+  }[lang];
+
+  const styles = html`<style>
+    body {
+      max-width: min(124ch, 96vw);
+      padding: 1rem 1rem 2.25rem;
+      background: #fafafa;
+    }
+
+    main { width: 100%; }
+
+    .writer-head { margin-bottom: 1rem; }
+
+    .writer-shell {
+      display: grid;
+      gap: .9rem;
+      width: 100%;
+    }
+
+    .write-card {
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: .9rem 1rem;
+      background: #fff;
+    }
+
+    .write-row {
+      display: grid;
+      gap: .35rem;
+      margin-bottom: .7rem;
+    }
+
+    .write-row label {
+      font-size: .9rem;
+      color: #555;
+      font-weight: 600;
+    }
+
+    .write-row input,
+    .write-row select,
+    .write-row button {
+      font: inherit;
+      padding: .58rem .66rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    #post-title {
+      font-size: 2.1rem;
+      line-height: 1.25;
+      font-weight: 700;
+      border-color: #d8d8d8;
+    }
+
+    .meta-grid {
+      display: grid;
+      gap: .7rem;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 920px) {
+      .meta-grid {
+        grid-template-columns: 1.4fr .95fr .9fr;
+      }
+    }
+
+    .write-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .2rem; }
+
+    #write-status {
+      min-height: 1.25em;
+      margin-top: .35rem;
+      color: #b00020;
+    }
+
+    #write-status.ok { color: #0b7a25; }
+
+    .is-locked {
+      background: #f3f3f3 !important;
+      color: #666;
+      cursor: not-allowed;
+    }
+
+    .writer-body-card {
+      padding: 0;
+      overflow: hidden;
+      min-height: clamp(64vh, 78vh, 1400px);
+    }
+
+    #post-editor {
+      min-height: clamp(64vh, 78vh, 1400px);
+    }
+
+    .toastui-editor-defaultUI {
+      border: 0 !important;
+      border-radius: 0 !important;
+    }
+
+    .toastui-editor-toolbar { border-bottom: 1px solid #eee !important; }
+
+    .toastui-editor-md-container,
+    .toastui-editor-md-preview {
+      width: 100% !important;
+      float: none !important;
+    }
+
+    .toastui-editor-md-preview {
+      border-left: 0 !important;
+      border-top: 1px solid #eee !important;
+      min-height: 40vh;
+    }
+
+    .toastui-editor-contents,
+    .toastui-editor-md-container .toastui-editor {
+      font-family: "EB Garamond", Georgia, serif;
+      font-size: 1.1rem;
+      line-height: 1.75;
+    }
+
+    .toastui-editor-md-splitter {
+      display: none !important;
+    }
+  </style>`;
+
+  const content = html`
+    ${styles}
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+
+    <article class="writer-head">
+      <h1>${text.pageTitle}</h1>
+      <p>${text.description}</p>
+      <p class="meta">${text.intro}</p>
+    </article>
+
+    <section class="writer-shell">
+      <section class="write-card writer-meta-card">
+        <div class="write-row">
+          <label for="post-title">${text.postTitle}</label>
+          <input id="post-title" type="text" autocomplete="off" placeholder="${text.titlePlaceholder}">
+        </div>
+
+        <div class="meta-grid">
+          <div class="write-row">
+            <label for="post-slug">${text.slug}</label>
+            <input id="post-slug" type="text" pattern="[a-z0-9-]+" autocomplete="off">
+          </div>
+
+          <div class="write-row">
+            <label for="post-date">${text.date}</label>
+            <input id="post-date" type="date">
+          </div>
+
+          <div class="write-row">
+            <label for="post-lang">${text.language}</label>
+            <select id="post-lang">
+              <option value="en">English</option>
+              <option value="zh">中文</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="write-actions">
+          <button id="insert-image" type="button">${text.insertImage}</button>
+          <button id="publish-issue" type="button">${text.publish}</button>
+        </div>
+        <p id="write-status"></p>
+      </section>
+
+      <section class="write-card writer-body-card">
+        <div id="post-editor"></div>
+      </section>
+    </section>
+
+    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script>
+      (() => {
+        const titleEl = document.getElementById("post-title");
+        const slugEl = document.getElementById("post-slug");
+        const dateEl = document.getElementById("post-date");
+        const langEl = document.getElementById("post-lang");
+        const statusEl = document.getElementById("write-status");
+        const imageBtn = document.getElementById("insert-image");
+        const publishBtn = document.getElementById("publish-issue");
+        const editorHost = document.getElementById("post-editor");
+
+        if (!titleEl || !slugEl || !dateEl || !langEl || !statusEl || !imageBtn || !publishBtn || !editorHost) return;
+
+        const TEXT = {
+          fillAll: ${JSON.stringify(text.fillAll)},
+          badSlug: ${JSON.stringify(text.badSlug)},
+          badDate: ${JSON.stringify(text.badDate)},
+          publishConfirm: ${JSON.stringify(text.publishConfirm)},
+          imagePrompt: ${JSON.stringify(text.imagePrompt)},
+          fallbackNotice: ${JSON.stringify(text.fallbackNotice)},
+          openingIssue: ${JSON.stringify(text.openingIssue)},
+          issueOpened: ${JSON.stringify(text.issueOpened)},
+          issueOpenFailed: ${JSON.stringify(text.issueOpenFailed)},
+          publishLabel: ${JSON.stringify(text.publish)},
+        };
+
+        const setStatus = (message, ok) => {
+          statusEl.textContent = message;
+          statusEl.className = ok ? "ok" : "";
+        };
+
+        const clearStatus = () => {
+          statusEl.textContent = "";
+          statusEl.className = "";
+        };
+
+        const slugify = (value) => value
+          .toLowerCase()
+          .trim()
+          .replace(/[^a-z0-9\\s-]/g, "")
+          .replace(/\\s+/g, "-")
+          .replace(/-+/g, "-");
+
+        let publishing = false;
+
+        const buildIssueUrl = ({ title, slug, date, lang, body }) => {
+          const issueTitlePrefix = lang === "zh" ? "[publish-zh]" : "[publish]";
+          const issueTitle = issueTitlePrefix + " " + date + " " + slug + " " + title;
+          const payload = {
+            source: "write-page-v1",
+            title,
+            slug,
+            date,
+            lang,
+            body,
+          };
+          const issueBody = [
+            "<!-- blog-publish:v1 -->",
+            JSON.stringify(payload, null, 2),
+          ].join("\\n\\n");
+
+          const params = new URLSearchParams({
+            labels: "publish",
+            title: issueTitle,
+            body: issueBody,
+          });
+
+          return "https://github.com/GongJiYang/GongJiYang.github.io/issues/new?" + params.toString();
+        };
+
+        const bindActions = (getBody, insertText) => {
+          titleEl.addEventListener("input", () => {
+            clearStatus();
+            if (!slugEl.dataset.touched) slugEl.value = slugify(titleEl.value);
+          });
+
+          slugEl.addEventListener("input", () => {
+            slugEl.dataset.touched = "1";
+            clearStatus();
+          });
+
+          dateEl.addEventListener("input", clearStatus);
+          langEl.addEventListener("change", clearStatus);
+
+          imageBtn.addEventListener("click", () => {
+            const imagePath = window.prompt(TEXT.imagePrompt, "/assets/");
+            if (!imagePath) return;
+            insertText("\\n![image](" + imagePath + ")\\n");
+          });
+
+          publishBtn.addEventListener("click", async () => {
+            const title = titleEl.value.trim();
+            const slug = slugEl.value.trim();
+            const date = dateEl.value;
+            const lang = langEl.value;
+            const body = getBody();
+
+            if (!title || !slug || !date || !body) return setStatus(TEXT.fillAll, false);
+            if (!/^[a-z0-9-]+$/.test(slug)) return setStatus(TEXT.badSlug, false);
+            if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) return setStatus(TEXT.badDate, false);
+            if (!window.confirm(TEXT.publishConfirm)) return;
+            if (publishing) return;
+
+            publishing = true;
+            publishBtn.disabled = true;
+            publishBtn.classList.add("is-locked");
+            setStatus(TEXT.openingIssue, false);
+
+            try {
+              const issueUrl = buildIssueUrl({ title, slug, date, lang, body });
+              const opened = window.open(issueUrl, "_blank", "noopener,noreferrer");
+              if (!opened) {
+                setStatus(TEXT.issueOpenFailed, false);
+              } else {
+                setStatus(TEXT.issueOpened, true);
+              }
+            } finally {
+              publishing = false;
+              publishBtn.disabled = false;
+              publishBtn.classList.remove("is-locked");
+            }
+          });
+        };
+
+        const useFallbackEditor = () => {
+          const fallback = document.createElement("textarea");
+          fallback.id = "post-body-fallback";
+          fallback.placeholder = ${JSON.stringify(text.placeholder)};
+          fallback.style.width = "100%";
+          fallback.style.minHeight = "78vh";
+          fallback.style.border = "0";
+          fallback.style.padding = "1.2rem 1.3rem";
+          fallback.style.resize = "vertical";
+          fallback.style.lineHeight = "1.75";
+          fallback.style.fontSize = "1.1rem";
+          fallback.style.fontFamily = "EB Garamond, Georgia, serif";
+          fallback.style.outline = "none";
+          editorHost.replaceChildren(fallback);
+
+          const insertText = (snippet) => {
+            const start = fallback.selectionStart ?? fallback.value.length;
+            const end = fallback.selectionEnd ?? fallback.value.length;
+            fallback.value = fallback.value.slice(0, start) + snippet + fallback.value.slice(end);
+            const pos = start + snippet.length;
+            fallback.selectionStart = pos;
+            fallback.selectionEnd = pos;
+            fallback.focus();
+          };
+
+          bindActions(() => fallback.value.trim(), insertText);
+          setStatus(TEXT.fallbackNotice, false);
+          fallback.focus();
+        };
+
+        dateEl.value = new Date().toISOString().slice(0, 10);
+        langEl.value = ${JSON.stringify(lang)};
+        publishBtn.textContent = TEXT.publishLabel;
+
+        if (window.toastui && window.toastui.Editor) {
+          const editor = new window.toastui.Editor({
+            el: editorHost,
+            initialEditType: "markdown",
+            previewStyle: "vertical",
+            hideModeSwitch: true,
+            height: "78vh",
+            placeholder: ${JSON.stringify(text.placeholder)},
+            initialValue: "",
+          });
+
+          bindActions(
+            () => editor.getMarkdown().trim(),
+            (snippet) => editor.insertText(snippet),
+          );
+          return;
+        }
+
+        useFallbackEditor();
+      })();
+    </script>
+  `;
+
+  return base({
+    path: lang === "en" ? "/write/" : "/CN/write/",
+    title: `${text.title} — Jay67`,
+    description: text.description,
+    src: "/src/templates.ts",
+    content,
+    showLangSwitch: true,
+    showEditLink: false,
+  }, lang);
+};
 
 export const post_list = (posts: Post[], lang: "en" | "zh"): HtmlString => {
   const prefix = lang === "en" ? "" : "/CN";
@@ -180,7 +602,7 @@ export const post_list = (posts: Post[], lang: "en" | "zh"): HtmlString => {
   );
 
   return base({
-    path: "",
+    path: prefix ? `${prefix}/` : "/",
     title: "Jay67",
     description: blurb,
     src: "/src/templates.ts",
@@ -195,7 +617,7 @@ export function post(post: Post, spellcheck: boolean, lang: "en" | "zh"): HtmlSt
     src: post.src,
     title: post.title,
     description: post.summary,
-    path: post.path,
+    path: `${prefix}${post.path}`,
     content: html`
       <article ${spellcheck ? 'contentEditable="true"' : ""}>
         ${post.content}
@@ -204,7 +626,7 @@ export function post(post: Post, spellcheck: boolean, lang: "en" | "zh"): HtmlSt
   }, lang);
 }
 
-export const blogroll_list = (posts: blogroll.FeedEntry[]): HtmlString => {
+export const blogroll_list = (posts: blogroll.FeedEntry[], lang: "en" | "zh"): HtmlString => {
   function domain(url: string): string {
     return new URL(url).host;
   }
@@ -219,13 +641,14 @@ export const blogroll_list = (posts: blogroll.FeedEntry[]): HtmlString => {
             </li>`
   );
 
+  const prefix = lang === "en" ? "" : "/CN";
   return base({
-    path: "",
+    path: `${prefix}/blogroll.html`,
     title: "Jay67",
     description: blurb,
     src: "/src/templates.ts",
     content: html`<ul class="post-list">${list_items}</ul>`,
-  });
+  }, lang);
 };
 
 export function time(date: Date, cls?: string): HtmlString {
