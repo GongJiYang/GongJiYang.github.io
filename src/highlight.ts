@@ -1,18 +1,18 @@
-import { html, HtmlString } from "./templates.ts";
+import { html, HtmlString } from "./templates.tsx";
 
-import hljs_ from "highlight.js/lib/core";
+import hljs_ from "@highlightjs/highlight.min.js";
 const hljs: any = hljs_;
 hljs.configure({ classPrefix: "hl-" });
-import rust from "highlight.js/lib/languages/rust";
-import latex from "highlight.js/lib/languages/latex.js";
-import nix from "highlight.js/lib/languages/nix.js";
-import x86asm from "highlight.js/lib/languages/x86asm.js";
-import zig from "./highlight-zig.js";
+
+import latex from "@highlightjs/languages/latex.min.js";
+import nix from "@highlightjs/languages/nix.min.js";
+import x86asm from "@highlightjs/languages/x86asm.min.js";
+import zig from "./highlightjs-zig.js";
+
 hljs.registerLanguage("latex", latex);
 hljs.registerLanguage("nix", nix);
 hljs.registerLanguage("x86asm", x86asm);
 hljs.registerLanguage("Zig", zig);
-hljs.registerLanguage("rust", rust);
 hljs.registerLanguage("ungrammar", () => ({
   name: "ungrammar",
   contains: [
@@ -23,23 +23,22 @@ hljs.registerLanguage("ungrammar", () => ({
     },
     {
       scope: "literal",
-      match:"[A-Z][_a-zA-Z0-9]*(?= =)"
-    }
+      match: "[A-Z][_a-zA-Z0-9]*(?= =)",
+    },
   ],
 }));
 
 export function highlight(
-  source: string, //待高亮的源代码字符串
-  language?: string, //指定代码的编程语言，帮助确定高亮规则
-  highlight_spec?: string, //高亮的具体设置
+  source: string,
+  language?: string,
+  highlight_spec?: string,
 ): HtmlString {
   const spec = parse_highlight_spec(highlight_spec);
   let src = source;
   let callouts: Map<number, number[]>;
-  [src, callouts] = parse_callouts(src); //解析源代码中的标记
-  let highlighted: string = add_spans(src, language).value; //应用高亮规则
-  highlighted = highlighted.trimEnd(); //去除末尾空白字符
-  //处理高亮标签的嵌套和换行
+  [src, callouts] = parse_callouts(src);
+  let highlighted: string = add_spans(src, language).value;
+  highlighted = highlighted.trimEnd();
   const openTags: string[] = [];
   highlighted = highlighted.replace(
     /(<span [^>]+>)|(<\/span>)|(\n)/g,
@@ -58,7 +57,7 @@ export function highlight(
     },
   );
   const lines = highlighted.split("\n").map((it, idx) => {
-    const cls = spec.includes(idx + 1) ? ' hl-line' : '';
+    const cls = spec.includes(idx + 1) ? " hl-line" : "";
     const calls = (callouts.get(idx) ?? [])
       .map((it) => `<i class="callout" data-value="${it}"></i>`)
       .join(" ");
@@ -70,10 +69,15 @@ export function highlight(
 
 function add_spans(source: string, language?: string): HtmlString {
   if (!language || language === "adoc") return html`${source}`;
-  if (language === "console") return add_spans_console(source);
-  if (!hljs.getLanguage(language)) return html`${source}`;
-  const res = hljs.highlight(source, { language, ignoreIllegals: true });
-  return new HtmlString(res.value);
+  if (language == "console") return add_spans_console(source);
+  try {
+    const res = hljs.highlight(source, { language, ignoreIllegals: true });
+    return new HtmlString(res.value);
+  } catch (e) {
+    console.error(e);
+    console.error(`\n    hljs failed for language=${language}\n`);
+    return html`${source}`;
+  }
 }
 
 function add_spans_console(source: string): HtmlString {
@@ -104,7 +108,7 @@ function parse_highlight_spec(spec?: string): number[] {
       const [los, his] = el.split("-");
       const lo = parseInt(los, 10);
       const hi = parseInt(his, 10);
-      return Array.from({ length: (hi - lo) + 1 }, (x, i) => lo + i);
+      return Array.from({ length: (hi - lo) + 1 }, (_x, i) => lo + i);
     }
     return [parseInt(el, 10)];
   });
