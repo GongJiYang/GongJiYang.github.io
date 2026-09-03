@@ -167,6 +167,10 @@ dfn, .small-caps { font-style: normal; font-variant: small-caps; }
     overscroll-behavior-x: contain;
     scroll-behavior: smooth;
     scroll-snap-type: x proximity;
+    scrollbar-width: none;
+}
+.note-stack::-webkit-scrollbar {
+    display: none;
 }
 .note-panel {
     flex: 0 0 min(80ch, calc(100vw - 4ch));
