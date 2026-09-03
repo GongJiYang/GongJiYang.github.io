@@ -3,7 +3,7 @@ import * as blogroll from "./blogroll.ts";
 
 type Language = "en" | "zh";
 
-const site_url = "https://matklad.github.io";
+const site_url = "https://gongjiyang.github.io";
 // 中英切换
 const LANG_KEY = 'site_language';
 const navTexts: Record<Language, { about: string; blogroll: string; home: string; write: string; switchLang: string }> = {
@@ -75,10 +75,11 @@ export const base = (
   }
 
   header { margin-bottom: 2rem; }
-  header > nav { display: flex; column-gap: 2ch; align-items: baseline; flex-wrap: wrap; }
+  header > nav { display: flex; gap: .35rem 1.25ch; align-items: baseline; flex-wrap: wrap; }
   header a { font-style: normal; color: rgba(0, 0, 0, .8); text-decoration: none; }
   header a:hover { color: rgba(0, 0, 0, .8); text-decoration: underline; }
-  header .title { font-size: 1.25em; flex-grow: 2; }
+  header .title { font-size: 1.25em; margin-right: auto; }
+  :focus-visible { outline: 2px solid #6c02c9; outline-offset: 3px; }
 
   footer { margin-top: 2rem; }
   footer > p { display: flex; column-gap: 2ch; justify-content: center; flex-wrap: wrap; }
@@ -122,11 +123,7 @@ export const base = (
         <svg class="icon"><use href="/assets/icons.svg#rss"/></svg>
         Subscribe
       </a>
-      <a href="mailto:aleksey.kladov+blog@gmail.com">
-        <svg class="icon"><use href="/assets/icons.svg#email"/></svg>
-        Get in touch
-      </a>
-      <a href="https://github.com/matklad">
+      <a href="https://github.com/GongJiYang">
         <svg class="icon"><use href="/assets/icons.svg#github"/></svg>
           Jay67
       </a>
@@ -164,7 +161,7 @@ export const base = (
 </script>
 </html>
 `;
-const blurb = "Yet another programming blog by Alex Kladov aka matklad.";
+const blurb = "Notes on software, tools, and things worth understanding.";
 
 export function page(name: string, content: HtmlString, lang: "en" | "zh") {
   const prefix = lang === "en" ? "" : "/CN";
@@ -183,148 +180,269 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
     en: {
       title: "Write",
       pageTitle: "Write a post",
-      description: "Write in live-render mode and publish via GitHub Issue.",
+      description: "Focus here. Confirm once on GitHub; publishing after that is automatic.",
       postTitle: "Title",
-      titlePlaceholder: "Post title",
+      titlePlaceholder: "Untitled post",
+      details: "Publishing details",
       slug: "Slug",
+      slugPlaceholder: "untitled-post",
       date: "Date",
       language: "Language",
-      insertImage: "Insert image",
-      publish: "Publish via GitHub Issue",
-      fillAll: "Please fill title, slug, date and body.",
-      badSlug: "Slug must contain only lowercase letters, numbers and '-'.",
-      badDate: "Date must be in YYYY-MM-DD format.",
-      publishConfirm: "Open GitHub Issue to publish this post?",
-      intro: "Top area holds metadata; body area is live-render editor.",
-      placeholder: "Start writing your Djot/Markdown post here...",
-      imagePrompt: "Image path under /assets (example: /assets/demo.png):",
-      fallbackNotice: "Live editor failed to load, switched to plain editor.",
-      openingIssue: "Opening GitHub Issue...",
-      issueOpened: "Issue form opened in a new tab.",
-      issueOpenFailed: "Failed to open GitHub Issue.",
+      newDraft: "New draft",
+      insertImage: "Add image",
+      publish: "Continue on GitHub",
+      fillAll: "Add a title, slug, date, and some writing first.",
+      badSlug: "Use letters, numbers, and single hyphens in the slug.",
+      badDate: "Use a real date in YYYY-MM-DD format.",
+      placeholder: "Start writing in Markdown…",
+      fallbackNotice: "Live preview could not load. Plain-text editing is still available.",
+      openingIssue: "Preparing GitHub…",
+      issueOpened: "On GitHub, click “Submit new issue”. Publishing is automatic; there is no merge step.",
+      issueCopied: "Your post was copied. Paste it into the GitHub description, then submit. Publishing is automatic.",
+      issueOpenFailed: "The new tab was blocked. Allow pop-ups and try again.",
+      issueCopyFailed: "This post is too long for a link and could not be copied. Allow clipboard access and try again.",
+      wordUnit: "words",
+      localDraft: "Autosaved in this browser",
+      draftRestored: "Local draft restored",
+      draftSaving: "Saving…",
+      draftSaved: "Saved locally",
+      resetConfirm: "Discard this local draft and start a new post?",
+      imageUrl: "Image URL or /assets path",
+      imageUrlPlaceholder: "https://… or /assets/image.jpg",
+      imageAlt: "Description",
+      imageAltPlaceholder: "What the image shows",
+      imageInsert: "Insert",
+      cancel: "Cancel",
+      imageRequired: "Paste a public image URL or an existing /assets path.",
+      imageHint: "For a local file, drag it into the GitHub description before you submit the issue.",
+      shortcut: "⌘/Ctrl + Enter to continue",
     },
     zh: {
       title: "写作",
-      pageTitle: "在线写博客",
-      description: "类似 Obsidian 的单栏实时渲染写作，完成后通过 GitHub Issue 发布。",
+      pageTitle: "写一篇文章",
+      description: "在这里专心写作；到 GitHub 确认一次，之后会自动发布。",
       postTitle: "标题",
-      titlePlaceholder: "输入文章标题",
+      titlePlaceholder: "无标题文章",
+      details: "发布信息",
       slug: "Slug",
+      slugPlaceholder: "文章地址",
       date: "日期",
       language: "语言",
-      insertImage: "插入图片",
-      publish: "通过 GitHub Issue 发布",
-      fillAll: "请填写标题、slug、日期和正文。",
-      badSlug: "Slug 只能包含小写字母、数字和连字符。",
-      badDate: "日期格式需为 YYYY-MM-DD。",
-      publishConfirm: "确认打开 GitHub Issue 发布吗？",
-      intro: "顶部是元信息，正文区是实时渲染编辑器。",
-      placeholder: "在这里开始写 Djot/Markdown 正文...",
-      imagePrompt: "输入 /assets 下的图片路径（例如：/assets/demo.png）：",
-      fallbackNotice: "实时编辑器加载失败，已切换到纯文本编辑器。",
-      openingIssue: "正在打开 GitHub Issue...",
-      issueOpened: "已在新标签页打开 Issue 表单。",
-      issueOpenFailed: "打开 GitHub Issue 失败。",
+      newDraft: "新建草稿",
+      insertImage: "添加图片",
+      publish: "前往 GitHub 确认",
+      fillAll: "请先填写标题、slug、日期和正文。",
+      badSlug: "Slug 只能使用文字、数字和单个连字符。",
+      badDate: "请输入 YYYY-MM-DD 格式的真实日期。",
+      placeholder: "开始用 Markdown 写作…",
+      fallbackNotice: "实时预览加载失败，仍可继续纯文本写作。",
+      openingIssue: "正在准备 GitHub…",
+      issueOpened: "请在 GitHub 点击“Submit new issue”。之后会自动发布，不需要合并。",
+      issueCopied: "文章已复制。请粘贴到 GitHub 的描述框并提交，之后会自动发布。",
+      issueOpenFailed: "新标签页被拦截，请允许弹窗后重试。",
+      issueCopyFailed: "文章过长，且无法复制。请允许剪贴板权限后重试。",
+      wordUnit: "字词",
+      localDraft: "已自动保存在此浏览器",
+      draftRestored: "已恢复本地草稿",
+      draftSaving: "正在保存…",
+      draftSaved: "已保存到本地",
+      resetConfirm: "丢弃当前本地草稿并新建文章？",
+      imageUrl: "图片 URL 或 /assets 路径",
+      imageUrlPlaceholder: "https://… 或 /assets/image.jpg",
+      imageAlt: "图片说明",
+      imageAltPlaceholder: "描述图片内容",
+      imageInsert: "插入",
+      cancel: "取消",
+      imageRequired: "请粘贴公开图片 URL，或已有的 /assets 路径。",
+      imageHint: "本地图片可在 GitHub 确认页直接拖入描述框，再提交 Issue。",
+      shortcut: "⌘/Ctrl + Enter 前往确认",
     },
   }[lang];
 
   const styles = html`<style>
     body {
-      max-width: min(124ch, 96vw);
-      padding: 1rem 1rem 2.25rem;
-      background: #fafafa;
+      width: 100%;
+      max-width: 1160px;
+      padding: 1rem clamp(1rem, 3vw, 2.5rem) 2rem;
+      background: #fbfbfa;
     }
 
-    main { width: 100%; }
+    main { width: 100%; min-width: 0; }
 
-    .writer-head { margin-bottom: 1rem; }
+    .writer-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem 2rem;
+      margin: 0 0 1.25rem;
+    }
+
+    .writer-head h1 {
+      margin: 0 0 .35rem;
+      font-size: clamp(1.7rem, 4vw, 2.3rem);
+      letter-spacing: -.035em;
+    }
+
+    .writer-head p {
+      margin: 0;
+      color: #666;
+      font-family: "Open Sans", sans-serif;
+      font-size: .82rem;
+      line-height: 1.5;
+      text-align: left;
+    }
+
+    .writer-shortcut {
+      flex: none;
+      color: #8a8a8a !important;
+      white-space: nowrap;
+    }
 
     .writer-shell {
-      display: grid;
-      gap: .9rem;
       width: 100%;
-    }
-
-    .write-card {
-      border: 1px solid #ddd;
+      min-width: 0;
+      overflow: hidden;
+      border: 1px solid #dededb;
       border-radius: 12px;
-      padding: .9rem 1rem;
       background: #fff;
+      box-shadow: 0 1px 0 rgba(0, 0, 0, .02);
     }
 
-    .write-row {
-      display: grid;
-      gap: .35rem;
-      margin-bottom: .7rem;
+    .writer-meta {
+      margin: 0;
+      padding: clamp(1rem, 2.5vw, 1.5rem);
+      border-bottom: 1px solid #e7e7e3;
     }
 
-    .write-row label {
-      font-size: .9rem;
-      color: #555;
-      font-weight: 600;
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      margin: -1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
     }
 
-    .write-row input,
-    .write-row select,
-    .write-row button {
-      font: inherit;
-      padding: .58rem .66rem;
-      border: 1px solid #ccc;
-      border-radius: 8px;
-      background: #fff;
+    .write-title input {
+      display: block;
+      width: 100%;
+      padding: 0 0 .65rem;
+      border: 0;
+      border-bottom: 1px solid #e0e0dc;
+      border-radius: 0;
+      background: transparent;
+      color: #222;
+      font: 700 clamp(1.7rem, 4vw, 2.5rem)/1.15 "EB Garamond", Georgia, serif;
+      text-overflow: ellipsis;
     }
 
-    #post-title {
-      font-size: 2.1rem;
-      line-height: 1.25;
-      font-weight: 700;
-      border-color: #d8d8d8;
+    .write-title input::placeholder { color: #aaa; opacity: 1; }
+
+    .publish-details {
+      margin-top: .8rem;
+      color: #666;
+      font-family: "Open Sans", sans-serif;
+      font-size: .7rem;
     }
+
+    .publish-details summary {
+      width: fit-content;
+      cursor: pointer;
+      color: #777;
+      list-style-position: outside;
+      user-select: none;
+    }
+
+    .publish-details summary:hover { color: #333; }
 
     .meta-grid {
       display: grid;
-      gap: .7rem;
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1.5fr) minmax(9rem, .85fr) minmax(8rem, .65fr);
+      gap: .7rem 1rem;
+      margin-top: .85rem;
     }
 
-    @media (min-width: 920px) {
-      .meta-grid {
-        grid-template-columns: 1.4fr .95fr .9fr;
-      }
+    .write-field {
+      display: grid;
+      min-width: 0;
+      gap: .3rem;
     }
 
-    .write-actions { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .2rem; }
-
-    #write-status {
-      min-height: 1.25em;
-      margin-top: .35rem;
-      color: #b00020;
+    .write-field label {
+      color: #777;
+      font-family: "Open Sans", sans-serif;
+      font-size: .68rem;
+      font-weight: 400;
+      letter-spacing: .035em;
     }
 
-    #write-status.ok { color: #0b7a25; }
-
-    .is-locked {
-      background: #f3f3f3 !important;
-      color: #666;
-      cursor: not-allowed;
+    .write-field input,
+    .write-field select,
+    .image-field input {
+      min-width: 0;
+      width: 100%;
+      height: 2.45rem;
+      padding: .48rem .62rem;
+      border: 1px solid #d8d8d4;
+      border-radius: 6px;
+      background: #fff;
+      color: #262626;
+      font: 400 .82rem/1.2 "JetBrains Mono", monospace;
     }
 
-    .writer-body-card {
-      padding: 0;
+    .write-title input:focus,
+    .write-field input:focus,
+    .write-field select:focus,
+    .image-field input:focus {
+      border-color: #6c02c9;
+      outline: 0;
+      box-shadow: 0 1px 0 #6c02c9;
+    }
+
+    .writer-body {
+      min-width: 0;
+      min-height: clamp(32rem, 68vh, 64rem);
+      margin: 0;
       overflow: hidden;
-      min-height: clamp(64vh, 78vh, 1400px);
     }
 
     #post-editor {
-      min-height: clamp(64vh, 78vh, 1400px);
+      width: 100%;
+      min-width: 0;
+      min-height: clamp(32rem, 68vh, 64rem);
     }
 
     .toastui-editor-defaultUI {
+      width: 100% !important;
+      min-width: 0 !important;
       border: 0 !important;
       border-radius: 0 !important;
     }
 
-    .toastui-editor-toolbar { border-bottom: 1px solid #eee !important; }
+    .toastui-editor-toolbar {
+      min-width: 0 !important;
+      overflow-x: auto !important;
+      overflow-y: hidden !important;
+      border-bottom: 1px solid #e7e7e3 !important;
+      background: #fcfcfa !important;
+      scrollbar-width: thin;
+    }
+
+    .toastui-editor-toolbar-group {
+      display: inline-flex !important;
+      float: none !important;
+      white-space: nowrap;
+    }
+
+    .toastui-editor-main,
+    .toastui-editor-main-container,
+    .toastui-editor-md-container,
+    .toastui-editor-md-preview {
+      min-width: 0 !important;
+    }
 
     .toastui-editor-md-container,
     .toastui-editor-md-preview {
@@ -333,73 +451,255 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
     }
 
     .toastui-editor-md-preview {
+      min-height: 24rem;
+      border-top: 1px solid #ecece8 !important;
       border-left: 0 !important;
-      border-top: 1px solid #eee !important;
-      min-height: 40vh;
     }
+
+    .toastui-editor-md-splitter { display: none !important; }
 
     .toastui-editor-contents,
     .toastui-editor-md-container .toastui-editor {
       font-family: "EB Garamond", Georgia, serif;
-      font-size: 1.1rem;
-      line-height: 1.75;
+      font-size: 1.05rem;
+      line-height: 1.7;
     }
 
-    .toastui-editor-md-splitter {
-      display: none !important;
+    .toastui-editor-md-container .toastui-editor {
+      padding: .75rem clamp(.9rem, 2vw, 1.5rem);
+    }
+
+    #post-body-fallback {
+      display: block;
+      width: 100%;
+      min-height: clamp(32rem, 68vh, 64rem);
+      padding: 1.25rem clamp(1rem, 3vw, 2rem);
+      resize: vertical;
+      border: 0;
+      background: #fff;
+      color: #222;
+      outline: 0;
+      font: 400 1.05rem/1.7 "EB Garamond", Georgia, serif;
+    }
+
+    .writer-footer {
+      padding: .85rem clamp(1rem, 2.5vw, 1.5rem) 1rem;
+      border-top: 1px solid #e7e7e3;
+      background: #fcfcfa;
+    }
+
+    .writer-actions {
+      display: flex;
+      align-items: center;
+      gap: .65rem;
+    }
+
+    .draft-meta {
+      display: flex;
+      min-width: 0;
+      align-items: center;
+      gap: .45rem;
+      margin-right: auto;
+      color: #777;
+      font-family: "Open Sans", sans-serif;
+      font-size: .65rem;
+      line-height: 1.35;
+    }
+
+    .draft-meta span + span::before {
+      content: "·";
+      margin-right: .45rem;
+      color: #bbb;
+    }
+
+    .write-button {
+      appearance: none;
+      min-height: 2.35rem;
+      padding: .48rem .85rem;
+      border: 1px solid #cfcfca;
+      border-radius: 999px;
+      background: #fff;
+      color: #333;
+      cursor: pointer;
+      font: 400 .68rem/1 "Open Sans", sans-serif;
+      white-space: nowrap;
+    }
+
+    .write-button:hover {
+      border-color: #888;
+      background: #f7f7f4;
+    }
+
+    .write-button.primary {
+      border-color: #6c02c9;
+      background: #6c02c9;
+      color: #fff;
+    }
+
+    .write-button.primary:hover {
+      border-color: #53009a;
+      background: #53009a;
+    }
+
+    .write-button:disabled {
+      cursor: wait;
+      opacity: .55;
+    }
+
+    .image-panel {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) auto auto;
+      gap: .65rem;
+      align-items: end;
+      margin-top: .85rem;
+      padding-top: .85rem;
+      border-top: 1px solid #e7e7e3;
+    }
+
+    .image-panel[hidden] { display: none; }
+
+    .image-field {
+      display: grid;
+      min-width: 0;
+      gap: .3rem;
+    }
+
+    .image-field label {
+      color: #777;
+      font-family: "Open Sans", sans-serif;
+      font-size: .68rem;
+    }
+
+    .image-hint {
+      grid-column: 1 / -1;
+      margin: 0;
+      color: #777;
+      font-family: "Open Sans", sans-serif;
+      font-size: .65rem;
+      line-height: 1.45;
+    }
+
+    #write-status {
+      min-height: 1.25em;
+      margin: .65rem 0 0;
+      color: #a3152a;
+      font-family: "Open Sans", sans-serif;
+      font-size: .68rem;
+      text-align: right;
+    }
+
+    #write-status:empty { display: none; }
+    #write-status.ok { color: #26713a; }
+
+    @media (max-width: 700px) {
+      body { padding: .8rem .8rem 1.5rem; }
+      header { margin-bottom: 1.45rem; }
+      header > nav { column-gap: 1ch; }
+      .writer-head { align-items: start; }
+      .writer-shortcut { display: none; }
+      .meta-grid { grid-template-columns: 1fr 1fr; }
+      .meta-grid .write-field:first-child { grid-column: 1 / -1; }
+      .writer-actions { align-items: stretch; flex-wrap: wrap; }
+      .draft-meta { flex-basis: 100%; order: 4; margin-top: .1rem; }
+      .write-button { flex: 1; }
+      .image-panel { grid-template-columns: 1fr 1fr; }
+      .image-panel .image-field { grid-column: 1 / -1; }
+      #write-status { text-align: left; }
+      .writer-body,
+      #post-editor,
+      #post-body-fallback { min-height: 62vh; }
+    }
+
+    @media (max-width: 430px) {
+      .writer-head h1 { font-size: 1.65rem; }
+      .writer-head p { font-size: .75rem; }
+      .writer-meta { padding: 1rem; }
+      .write-title input { font-size: 1.65rem; }
+      .meta-grid { grid-template-columns: 1fr; }
+      .meta-grid .write-field:first-child { grid-column: auto; }
+      .draft-meta { display: grid; gap: .1rem; }
+      .draft-meta span + span::before { content: none; }
+      .toastui-editor-toolbar { padding-left: 4px !important; }
     }
   </style>`;
 
   const content = html`
     ${styles}
-    <link rel="stylesheet" href="https://uicdn.toast.com/editor/latest/toastui-editor.min.css">
+    <link rel="stylesheet" href="https://uicdn.toast.com/editor/3.2.2/toastui-editor.min.css">
 
     <article class="writer-head">
-      <h1>${text.pageTitle}</h1>
-      <p>${text.description}</p>
-      <p class="meta">${text.intro}</p>
+      <div>
+        <h1>${text.pageTitle}</h1>
+        <p>${text.description}</p>
+      </div>
+      <p class="writer-shortcut">${text.shortcut}</p>
     </article>
 
     <section class="writer-shell">
-      <section class="write-card writer-meta-card">
-        <div class="write-row">
-          <label for="post-title">${text.postTitle}</label>
+      <section class="writer-meta" aria-label="${text.pageTitle}">
+        <div class="write-title">
+          <label class="sr-only" for="post-title">${text.postTitle}</label>
           <input id="post-title" type="text" autocomplete="off" placeholder="${text.titlePlaceholder}">
         </div>
 
-        <div class="meta-grid">
-          <div class="write-row">
-            <label for="post-slug">${text.slug}</label>
-            <input id="post-slug" type="text" pattern="[a-z0-9-]+" autocomplete="off">
-          </div>
+        <details class="publish-details">
+          <summary>${text.details}</summary>
+          <div class="meta-grid">
+            <div class="write-field">
+              <label for="post-slug">${text.slug}</label>
+              <input id="post-slug" type="text" autocomplete="off" placeholder="${text.slugPlaceholder}">
+            </div>
 
-          <div class="write-row">
-            <label for="post-date">${text.date}</label>
-            <input id="post-date" type="date">
-          </div>
+            <div class="write-field">
+              <label for="post-date">${text.date}</label>
+              <input id="post-date" type="date">
+            </div>
 
-          <div class="write-row">
-            <label for="post-lang">${text.language}</label>
-            <select id="post-lang">
-              <option value="en">English</option>
-              <option value="zh">中文</option>
-            </select>
+            <div class="write-field">
+              <label for="post-lang">${text.language}</label>
+              <select id="post-lang">
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+              </select>
+            </div>
           </div>
-        </div>
-
-        <div class="write-actions">
-          <button id="insert-image" type="button">${text.insertImage}</button>
-          <button id="publish-issue" type="button">${text.publish}</button>
-        </div>
-        <p id="write-status"></p>
+        </details>
       </section>
 
-      <section class="write-card writer-body-card">
+      <section class="writer-body" aria-label="${text.placeholder}">
         <div id="post-editor"></div>
       </section>
+
+      <footer class="writer-footer">
+        <div class="writer-actions">
+          <div class="draft-meta" aria-live="polite">
+            <span id="word-count">0 ${text.wordUnit}</span>
+            <span id="draft-state">${text.localDraft}</span>
+          </div>
+          <button class="write-button" id="new-draft" type="button">${text.newDraft}</button>
+          <button class="write-button" id="insert-image" type="button" aria-expanded="false" aria-controls="image-panel">${text.insertImage}</button>
+          <button class="write-button primary" id="publish-issue" type="button">${text.publish}</button>
+        </div>
+
+        <form class="image-panel" id="image-panel" hidden>
+          <div class="image-field">
+            <label for="image-url">${text.imageUrl}</label>
+            <input id="image-url" type="text" inputmode="url" autocomplete="url" placeholder="${text.imageUrlPlaceholder}">
+          </div>
+          <div class="image-field">
+            <label for="image-alt">${text.imageAlt}</label>
+            <input id="image-alt" type="text" autocomplete="off" placeholder="${text.imageAltPlaceholder}">
+          </div>
+          <button class="write-button" id="cancel-image" type="button">${text.cancel}</button>
+          <button class="write-button primary" type="submit">${text.imageInsert}</button>
+          <p class="image-hint">${text.imageHint}</p>
+        </form>
+
+        <p id="write-status" role="status" aria-live="polite"></p>
+      </footer>
     </section>
 
-    <script src="https://uicdn.toast.com/editor/latest/toastui-editor-all.min.js"></script>
+    <script src="https://uicdn.toast.com/editor/3.2.2/toastui-editor-all.min.js"></script>
     <script>
       (() => {
         const titleEl = document.getElementById("post-title");
@@ -407,24 +707,42 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
         const dateEl = document.getElementById("post-date");
         const langEl = document.getElementById("post-lang");
         const statusEl = document.getElementById("write-status");
+        const wordCountEl = document.getElementById("word-count");
+        const draftStateEl = document.getElementById("draft-state");
+        const newDraftBtn = document.getElementById("new-draft");
         const imageBtn = document.getElementById("insert-image");
+        const imagePanel = document.getElementById("image-panel");
+        const imageUrlEl = document.getElementById("image-url");
+        const imageAltEl = document.getElementById("image-alt");
+        const cancelImageBtn = document.getElementById("cancel-image");
         const publishBtn = document.getElementById("publish-issue");
         const editorHost = document.getElementById("post-editor");
 
-        if (!titleEl || !slugEl || !dateEl || !langEl || !statusEl || !imageBtn || !publishBtn || !editorHost) return;
+        if (!titleEl || !slugEl || !dateEl || !langEl || !statusEl || !wordCountEl || !draftStateEl || !newDraftBtn || !imageBtn || !imagePanel || !imageUrlEl || !imageAltEl || !cancelImageBtn || !publishBtn || !editorHost) return;
 
         const TEXT = {
           fillAll: ${JSON.stringify(text.fillAll)},
           badSlug: ${JSON.stringify(text.badSlug)},
           badDate: ${JSON.stringify(text.badDate)},
-          publishConfirm: ${JSON.stringify(text.publishConfirm)},
-          imagePrompt: ${JSON.stringify(text.imagePrompt)},
           fallbackNotice: ${JSON.stringify(text.fallbackNotice)},
           openingIssue: ${JSON.stringify(text.openingIssue)},
           issueOpened: ${JSON.stringify(text.issueOpened)},
+          issueCopied: ${JSON.stringify(text.issueCopied)},
           issueOpenFailed: ${JSON.stringify(text.issueOpenFailed)},
+          issueCopyFailed: ${JSON.stringify(text.issueCopyFailed)},
           publishLabel: ${JSON.stringify(text.publish)},
+          wordUnit: ${JSON.stringify(text.wordUnit)},
+          localDraft: ${JSON.stringify(text.localDraft)},
+          draftRestored: ${JSON.stringify(text.draftRestored)},
+          draftSaving: ${JSON.stringify(text.draftSaving)},
+          draftSaved: ${JSON.stringify(text.draftSaved)},
+          resetConfirm: ${JSON.stringify(text.resetConfirm)},
+          imageRequired: ${JSON.stringify(text.imageRequired)},
         };
+
+        const PAGE_LANG = ${JSON.stringify(lang)};
+        const DRAFT_KEY = "jay67-write-draft-v2:" + PAGE_LANG;
+        const LEGACY_DRAFT_KEY = "jay67-write-draft-v1";
 
         const setStatus = (message, ok) => {
           statusEl.textContent = message;
@@ -437,106 +755,269 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
         };
 
         const slugify = (value) => value
-          .toLowerCase()
+          .normalize("NFKC")
+          .toLocaleLowerCase()
           .trim()
-          .replace(/[^a-z0-9\\s-]/g, "")
+          .replace(/[^\\p{L}\\p{N}\\s-]/gu, "")
           .replace(/\\s+/g, "-")
-          .replace(/-+/g, "-");
+          .replace(/-+/g, "-")
+          .replace(/^-|-$/g, "");
 
+        const validSlug = (value) =>
+          value.length <= 80 &&
+          /^[\\p{L}\\p{N}]+(?:-[\\p{L}\\p{N}]+)*$/u.test(value);
+
+        const localDate = () => {
+          const now = new Date();
+          now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+          return now.toISOString().slice(0, 10);
+        };
+
+        const validDate = (value) => {
+          if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(value)) return false;
+          const parsed = new Date(value + "T00:00:00Z");
+          return !Number.isNaN(parsed.valueOf()) && parsed.toISOString().slice(0, 10) === value;
+        };
+
+        let draft = {};
+        let migratedLegacyDraft = false;
+        try {
+          const saved = localStorage.getItem(DRAFT_KEY);
+          if (saved) {
+            draft = JSON.parse(saved);
+          } else {
+            const legacy = JSON.parse(localStorage.getItem(LEGACY_DRAFT_KEY) || "{}");
+            if (legacy.lang === PAGE_LANG) {
+              draft = legacy;
+              migratedLegacyDraft = true;
+            }
+          }
+        } catch {
+          draft = {};
+        }
+
+        titleEl.value = typeof draft.title === "string" ? draft.title : "";
+        slugEl.value = typeof draft.slug === "string" ? draft.slug : "";
+        dateEl.value = typeof draft.date === "string" && validDate(draft.date) ? draft.date : localDate();
+        langEl.value = draft.lang === "en" || draft.lang === "zh" ? draft.lang : PAGE_LANG;
+        const initialBody = typeof draft.body === "string" ? draft.body : "";
+        const hasDraft = Boolean(titleEl.value || slugEl.value || initialBody);
+        if (hasDraft) draftStateEl.textContent = TEXT.draftRestored;
+
+        let slugTouched = Boolean(slugEl.value);
         let publishing = false;
 
-        const buildIssueUrl = ({ title, slug, date, lang, body }) => {
+        const buildIssue = ({ title, slug, date, lang, body }) => {
           const issueTitlePrefix = lang === "zh" ? "[publish-zh]" : "[publish]";
           const issueTitle = issueTitlePrefix + " " + date + " " + slug + " " + title;
-          const payload = {
-            source: "write-page-v1",
+          const meta = {
+            source: "write-page-v2",
             title,
             slug,
             date,
             lang,
-            body,
           };
-          const issueBody = [
-            "<!-- blog-publish:v1 -->",
-            JSON.stringify(payload, null, 2),
-          ].join("\\n\\n");
-
-          const params = new URLSearchParams({
-            labels: "publish",
-            title: issueTitle,
-            body: issueBody,
-          });
-
-          return "https://github.com/GongJiYang/GongJiYang.github.io/issues/new?" + params.toString();
+          const issueBody = "<!-- blog-publish:v2 " + JSON.stringify(meta) + " -->\\n\\n" + body;
+          const params = new URLSearchParams({ title: issueTitle, body: issueBody });
+          const url = "https://github.com/GongJiYang/GongJiYang.github.io/issues/new?" + params.toString();
+          return { issueTitle, issueBody, url };
         };
 
-        const bindActions = (getBody, insertText) => {
-          titleEl.addEventListener("input", () => {
+        const bindActions = (getBody, setBody, insertText, observeBody) => {
+          let saveTimer;
+          let lastSaved = "";
+
+          const snapshot = () => JSON.stringify({
+            title: titleEl.value,
+            slug: slugEl.value,
+            date: dateEl.value,
+            lang: langEl.value,
+            body: getBody(),
+          });
+
+          const updateWordCount = () => {
+            const readableBody = getBody()
+              .replace(/!\\[[^\\]]*\\]\\([^)]*\\)/g, "")
+              .replace(/\\[([^\\]]+)\\]\\([^)]*\\)/g, "$1")
+              .replace(/https?:\\/\\/\\S+/g, "")
+              .replace(/[\`#>*_~-]/g, " ");
+            const words = readableBody.match(/[\\u3400-\\u9fff]|[\\p{L}\\p{N}]+/gu) || [];
+            wordCountEl.textContent = words.length + " " + TEXT.wordUnit;
+          };
+
+          const saveDraft = () => {
+            window.clearTimeout(saveTimer);
+            const next = snapshot();
+            if (next === lastSaved) return;
+            try {
+              localStorage.setItem(DRAFT_KEY, next);
+              if (migratedLegacyDraft) {
+                localStorage.removeItem(LEGACY_DRAFT_KEY);
+                migratedLegacyDraft = false;
+              }
+              lastSaved = next;
+              draftStateEl.textContent = TEXT.draftSaved;
+            } catch {
+              draftStateEl.textContent = TEXT.localDraft;
+            }
+          };
+
+          const scheduleSave = () => {
+            window.clearTimeout(saveTimer);
+            draftStateEl.textContent = TEXT.draftSaving;
+            saveTimer = window.setTimeout(saveDraft, 450);
+          };
+
+          const changed = () => {
             clearStatus();
-            if (!slugEl.dataset.touched) slugEl.value = slugify(titleEl.value);
+            scheduleSave();
+          };
+
+          titleEl.addEventListener("input", () => {
+            if (!slugTouched) slugEl.value = slugify(titleEl.value);
+            changed();
           });
 
           slugEl.addEventListener("input", () => {
-            slugEl.dataset.touched = "1";
+            slugTouched = Boolean(slugEl.value);
+            changed();
+          });
+
+          dateEl.addEventListener("input", changed);
+          langEl.addEventListener("change", changed);
+
+          observeBody(() => {
+            clearStatus();
+            updateWordCount();
+            scheduleSave();
+          });
+
+          const closeImagePanel = () => {
+            imagePanel.hidden = true;
+            imageBtn.setAttribute("aria-expanded", "false");
+          };
+
+          imageBtn.addEventListener("click", () => {
+            imagePanel.hidden = !imagePanel.hidden;
+            imageBtn.setAttribute("aria-expanded", imagePanel.hidden ? "false" : "true");
+            if (!imagePanel.hidden) imageUrlEl.focus();
+          });
+
+          cancelImageBtn.addEventListener("click", () => {
+            closeImagePanel();
             clearStatus();
           });
 
-          dateEl.addEventListener("input", clearStatus);
-          langEl.addEventListener("change", clearStatus);
-
-          imageBtn.addEventListener("click", () => {
-            const imagePath = window.prompt(TEXT.imagePrompt, "/assets/");
-            if (!imagePath) return;
-            insertText("\\n![image](" + imagePath + ")\\n");
+          imagePanel.addEventListener("submit", (event) => {
+            event.preventDefault();
+            const url = imageUrlEl.value.trim();
+            const alt = imageAltEl.value.trim().replace(/\\]/g, "\\\\]");
+            if (!/^(https?:\\/\\/|\\/assets\\/)[^\\s]+$/i.test(url)) {
+              setStatus(TEXT.imageRequired, false);
+              imageUrlEl.focus();
+              return;
+            }
+            const safeUrl = url.replace(/\\s/g, "%20").replace(/\\)/g, "\\\\)");
+            insertText("\\n![" + alt + "](" + safeUrl + ")\\n");
+            imageUrlEl.value = "";
+            imageAltEl.value = "";
+            closeImagePanel();
           });
 
-          publishBtn.addEventListener("click", async () => {
+          newDraftBtn.addEventListener("click", () => {
+            const hasContent = Boolean(titleEl.value.trim() || getBody().trim());
+            if (hasContent && !window.confirm(TEXT.resetConfirm)) return;
+            window.clearTimeout(saveTimer);
+            titleEl.value = "";
+            slugEl.value = "";
+            dateEl.value = localDate();
+            langEl.value = PAGE_LANG;
+            slugTouched = false;
+            setBody("");
+            localStorage.removeItem(DRAFT_KEY);
+            localStorage.removeItem(LEGACY_DRAFT_KEY);
+            lastSaved = "";
+            updateWordCount();
+            draftStateEl.textContent = TEXT.localDraft;
+            clearStatus();
+            closeImagePanel();
+            titleEl.focus();
+          });
+
+          const publish = async () => {
+            if (publishing) return;
+
             const title = titleEl.value.trim();
             const slug = slugEl.value.trim();
             const date = dateEl.value;
-            const lang = langEl.value;
-            const body = getBody();
+            const selectedLang = langEl.value;
+            const body = getBody().trim();
 
             if (!title || !slug || !date || !body) return setStatus(TEXT.fillAll, false);
-            if (!/^[a-z0-9-]+$/.test(slug)) return setStatus(TEXT.badSlug, false);
-            if (!/^\\d{4}-\\d{2}-\\d{2}$/.test(date)) return setStatus(TEXT.badDate, false);
-            if (!window.confirm(TEXT.publishConfirm)) return;
-            if (publishing) return;
+            if (!validSlug(slug)) return setStatus(TEXT.badSlug, false);
+            if (!validDate(date)) return setStatus(TEXT.badDate, false);
 
             publishing = true;
             publishBtn.disabled = true;
-            publishBtn.classList.add("is-locked");
             setStatus(TEXT.openingIssue, false);
+            saveDraft();
+
+            const handoff = buildIssue({ title, slug, date, lang: selectedLang, body });
+            const opened = window.open("about:blank", "_blank");
+            if (!opened) {
+              publishing = false;
+              publishBtn.disabled = false;
+              setStatus(TEXT.issueOpenFailed, false);
+              return;
+            }
+            opened.opener = null;
 
             try {
-              const issueUrl = buildIssueUrl({ title, slug, date, lang, body });
-              const opened = window.open(issueUrl, "_blank", "noopener,noreferrer");
-              if (!opened) {
-                setStatus(TEXT.issueOpenFailed, false);
-              } else {
-                setStatus(TEXT.issueOpened, true);
+              let targetUrl = handoff.url;
+              let copied = false;
+              if (targetUrl.length > 7000) {
+                try {
+                  await navigator.clipboard.writeText(handoff.issueBody);
+                  const params = new URLSearchParams({ title: handoff.issueTitle });
+                  targetUrl = "https://github.com/GongJiYang/GongJiYang.github.io/issues/new?" + params.toString();
+                  copied = true;
+                } catch {
+                  opened.close();
+                  setStatus(TEXT.issueCopyFailed, false);
+                  return;
+                }
               }
+              opened.location.replace(targetUrl);
+              setStatus(copied ? TEXT.issueCopied : TEXT.issueOpened, true);
             } finally {
               publishing = false;
               publishBtn.disabled = false;
-              publishBtn.classList.remove("is-locked");
             }
+          };
+
+          publishBtn.addEventListener("click", publish);
+          document.addEventListener("keydown", (event) => {
+            if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+              event.preventDefault();
+              publish();
+            }
+            if (event.key === "Escape" && !imagePanel.hidden) closeImagePanel();
           });
+          window.addEventListener("pagehide", saveDraft);
+
+          updateWordCount();
+          if (migratedLegacyDraft) {
+            saveDraft();
+          } else {
+            lastSaved = snapshot();
+          }
         };
 
         const useFallbackEditor = () => {
           const fallback = document.createElement("textarea");
           fallback.id = "post-body-fallback";
           fallback.placeholder = ${JSON.stringify(text.placeholder)};
-          fallback.style.width = "100%";
-          fallback.style.minHeight = "78vh";
-          fallback.style.border = "0";
-          fallback.style.padding = "1.2rem 1.3rem";
-          fallback.style.resize = "vertical";
-          fallback.style.lineHeight = "1.75";
-          fallback.style.fontSize = "1.1rem";
-          fallback.style.fontFamily = "EB Garamond, Georgia, serif";
-          fallback.style.outline = "none";
+          fallback.value = initialBody;
           editorHost.replaceChildren(fallback);
 
           const insertText = (snippet) => {
@@ -546,32 +1027,45 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
             const pos = start + snippet.length;
             fallback.selectionStart = pos;
             fallback.selectionEnd = pos;
+            fallback.dispatchEvent(new Event("input"));
             fallback.focus();
           };
 
-          bindActions(() => fallback.value.trim(), insertText);
+          bindActions(
+            () => fallback.value,
+            (value) => {
+              fallback.value = value;
+              fallback.dispatchEvent(new Event("input"));
+            },
+            insertText,
+            (listener) => fallback.addEventListener("input", listener),
+          );
           setStatus(TEXT.fallbackNotice, false);
           fallback.focus();
         };
-
-        dateEl.value = new Date().toISOString().slice(0, 10);
-        langEl.value = ${JSON.stringify(lang)};
-        publishBtn.textContent = TEXT.publishLabel;
 
         if (window.toastui && window.toastui.Editor) {
           const editor = new window.toastui.Editor({
             el: editorHost,
             initialEditType: "markdown",
-            previewStyle: "vertical",
+            previewStyle: window.matchMedia("(max-width: 700px)").matches ? "tab" : "vertical",
             hideModeSwitch: true,
-            height: "78vh",
+            height: "68vh",
             placeholder: ${JSON.stringify(text.placeholder)},
-            initialValue: "",
+            initialValue: initialBody,
+            toolbarItems: [
+              ["heading", "bold", "italic"],
+              ["quote", "ul", "ol", "task"],
+              ["link"],
+              ["code", "codeblock"],
+            ],
           });
 
           bindActions(
-            () => editor.getMarkdown().trim(),
+            () => editor.getMarkdown(),
+            (value) => editor.setMarkdown(value),
             (snippet) => editor.insertText(snippet),
+            (listener) => editor.on("change", listener),
           );
           return;
         }
