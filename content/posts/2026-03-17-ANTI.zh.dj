@@ -1,9 +1,0 @@
----
-tags: AI, 开发日志
----
-
-# ANTI开发流水账
-## 1. 概述
-
-ANTI是一个基于python开发的monorepo项目，作为本人的第一个大型的开源项目，此项目主要围绕基于gitcore的多agent自我开发工作流
-

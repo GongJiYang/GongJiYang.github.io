@@ -178,8 +178,10 @@ dfn, .small-caps { font-style: normal; font-variant: small-caps; }
     height: 100%;
     padding-right: 1ch;
     overflow-y: auto;
+    scrollbar-width: none;
     scroll-snap-align: start;
 }
+.note-panel::-webkit-scrollbar { display: none; }
 .note-panel:first-child { margin-left: max(0px, calc((100% - 80ch) / 2)); }
 .note-panel:last-child { margin-right: 2ch; }
 .note-panel + .note-panel {
