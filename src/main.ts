@@ -254,11 +254,13 @@ export type Post = {
   tags: string[];
 };
 
-function post_source(source: string): { body: string; tags: string[] } {
+function post_source(
+  source: string,
+): { body: string; tags: string[]; deleted: boolean } {
   const frontmatter = source.match(
     /^---\r?\n([\s\S]*?)\r?\n---(?:\r?\n|$)/,
   );
-  if (!frontmatter) return { body: source, tags: [] };
+  if (!frontmatter) return { body: source, tags: [], deleted: false };
 
   const tags: string[] = [];
   const add_tags = (value: string) => {
@@ -274,6 +276,7 @@ function post_source(source: string): { body: string; tags: string[] } {
   };
 
   const lines = frontmatter[1].split(/\r?\n/);
+  const deleted = lines.some((line) => /^delete:\s*true\s*$/i.test(line));
   for (let i = 0; i < lines.length; i++) {
     const tag_line = lines[i].match(/^tags:\s*(.*)$/);
     if (!tag_line) continue;
@@ -293,6 +296,7 @@ function post_source(source: string): { body: string; tags: string[] } {
   return {
     body: source.slice(frontmatter[0].length),
     tags,
+    deleted,
   };
 }
 
@@ -320,6 +324,7 @@ async function collect_posts(ctx: Ctx, filter: string): Promise<Post[]> {
     const text = await Deno.readTextFile(file_path);
     const source = post_source(text);
     ctx.read_ms += performance.now() - t;
+    if (source.deleted) continue;
 
     t = performance.now();
     const ast = djot.parse(source.body);
