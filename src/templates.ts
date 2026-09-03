@@ -162,7 +162,7 @@ export const base = (
         localStorage.setItem(LANG_KEY, savedLang);
       }
 
-      if (savedLang !== pathLang) {
+      if (savedLang !== pathLang && switchEl instanceof HTMLAnchorElement) {
         if (savedLang === 'zh' && !location.pathname.startsWith('/CN')) {
           location.pathname = '/CN' + location.pathname;
         } else if (savedLang === 'en' && location.pathname.startsWith('/CN')) {
