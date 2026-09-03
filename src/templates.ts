@@ -1017,8 +1017,10 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
               if (targetUrl.length > 7000) {
                 try {
                   await navigator.clipboard.writeText(handoff.issueBody);
-                  const params = new URLSearchParams({ title: handoff.issueTitle });
-                  targetUrl = "https://github.com/GongJiYang/GongJiYang.github.io/issues/new?" + params.toString();
+                  const pastePrompt = selectedLang === "zh"
+                    ? "文章较长，正文已复制到剪贴板。\\n\\n请点击此描述框，按 ⌘/Ctrl+A 全选，再按 ⌘/Ctrl+V 粘贴正文；确认开头出现 blog-publish 标记后再提交。"
+                    : "This post is too long to prefill. It is already on your clipboard.\\n\\nClick this description, press ⌘/Ctrl+A, then ⌘/Ctrl+V. Confirm that a blog-publish marker appears at the top before submitting.";
+                  const params = new URLSearchParams({ title: handoff.issueTitle, body: pastePrompt });
                   copied = true;
                 } catch {
                   opened.close();
