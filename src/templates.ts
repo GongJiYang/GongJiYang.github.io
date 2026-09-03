@@ -100,7 +100,7 @@ export const base = (
 
   </style>
 
-  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/main.css?v=20260904">
   ${extra_css ? html`<link rel="stylesheet" href="/css/${extra_css}">` : ""}
 </head>
 
