@@ -409,6 +409,7 @@ export type Post = {
   src: string;
   content: HtmlString;
   summary: string;
+  tags: string[];
   lang: "en" | "zh";
 };
 
@@ -426,6 +427,13 @@ async function walk(dir: string): Promise<string[]> {
     }
   }
   return files;
+}
+
+function post_source(source: string): { body: string; tags: string[] } {
+  const metadata = source.match(/^---\r?\ntags:\s*([^\r\n]+)\r?\n---\r?\n?/);
+  if (!metadata) return { body: source, tags: [] };
+  const tags = [...new Set(metadata[1].split(",").map(tag => tag.trim()).filter(Boolean))];
+  return { body: source.slice(metadata[0].length), tags };
 }
 
 // 在 Bun 环境下实现 collect_posts 有问题
@@ -451,10 +459,11 @@ async function collect_posts(ctx: Ctx, filter: string): Promise<Post[]> {
 
     let t = performance.now();
     const text = await fspromise.readFile(filePath, "utf-8");
+    const source = post_source(text);
     ctx.read_ms += performance.now() - t;
 
     t = performance.now();
-    const ast = djot.parse(text);
+    const ast = djot.parse(source.body);
     ctx.parse_ms += performance.now() - t;
 
     t = performance.now();
@@ -471,6 +480,7 @@ async function collect_posts(ctx: Ctx, filter: string): Promise<Post[]> {
       title: render_ctx.title!,
       content: html,
       summary: render_ctx.summary!,
+      tags: source.tags,
       path: `/${y}/${m}/${d}/${slug}.html`,
       src: `/content/posts/${y}-${m}-${d}-${slug}${lang === "zh" ? ".zh" : ""}.dj`,
       lang: lang as "zh" | "en", // 新增

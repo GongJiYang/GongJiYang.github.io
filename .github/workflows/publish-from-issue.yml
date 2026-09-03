@@ -84,13 +84,20 @@ jobs:
             const slug = typeof payload.slug === 'string' ? payload.slug.trim() : '';
             const date = typeof payload.date === 'string' ? payload.date.trim() : '';
             const lang = payload.lang === 'zh' ? 'zh' : payload.lang === 'en' ? 'en' : '';
+            const rawTags = payload.tags;
+            const tags = Array.isArray(rawTags)
+              ? rawTags.map(tag => typeof tag === 'string' ? tag.trim() : '')
+              : [];
+            const tagsOk = (rawTags === undefined || Array.isArray(rawTags)) &&
+              tags.length <= 8 &&
+              tags.every(tag => /^[\p{L}\p{N}][\p{L}\p{N} _-]{0,31}$/u.test(tag));
             const slugOk = slug.length <= 80 && /^[\p{L}\p{N}]+(?:-[\p{L}\p{N}]+)*$/u.test(slug);
             const dateMatch = date.match(/^(\d{4})-(\d{2})-(\d{2})$/);
             const parsedDate = dateMatch ? new Date(`${date}T00:00:00Z`) : null;
             const dateOk = parsedDate && !Number.isNaN(parsedDate.valueOf()) && parsedDate.toISOString().slice(0, 10) === date;
 
-            if (!title || !slugOk || !dateOk || !lang || !body) {
-              await comment('Invalid publish fields. Required: title, safe slug, real date, language, and body.');
+            if (!title || !slugOk || !dateOk || !lang || !body || !tagsOk) {
+              await comment('Invalid publish fields. Required: title, safe slug, up to 8 safe tags, real date, language, and body.');
               return;
             }
 
@@ -116,7 +123,9 @@ jobs:
             }
 
             if (!existingFileSha) {
-              const content = body.startsWith('# ') ? `${body}\n` : `# ${title}\n\n${body}\n`;
+              const article = body.startsWith('# ') ? `${body}\n` : `# ${title}\n\n${body}\n`;
+              const metadata = tags.length ? `---\ntags: ${tags.join(', ')}\n---\n\n` : '';
+              const content = metadata + article;
               await github.rest.repos.createOrUpdateFileContents({
                 owner,
                 repo,

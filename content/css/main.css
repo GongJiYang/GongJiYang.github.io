@@ -146,6 +146,77 @@ dfn, .small-caps { font-style: normal; font-variant: small-caps; }
 .post-list h2   { margin-top: 0; }
 .post-list a       { color: #6c02c9; text-decoration: none; display: block; }
 .post-list a:hover { color: #6c02c9; text-decoration: underline; }
+.tag-index { margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #dddddf; }
+.tag-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1.5rem 2rem; }
+.tag-group { margin-top: 0; }
+.tag-group h2 { margin-bottom: .65rem; font-size: 1rem; }
+.tag-group ul { margin: 0; list-style: none; }
+.tag-group li + li { margin-top: .3rem; }
+.tag-group a { color: rgba(0, 0, 0, .8); text-decoration: none; }
+.tag-group a:hover { color: #6c02c9; text-decoration: underline; }
+.article-page { max-width: none; overflow-x: hidden; }
+.article-page > header,
+.article-page > footer { width: min(100%, 80ch); margin-left: auto; margin-right: auto; }
+.article-page > main { width: 100%; }
+.note-stack {
+    display: flex;
+    gap: 2ch;
+    height: calc(100dvh - 7rem);
+    min-height: 24rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-behavior: smooth;
+    scroll-snap-type: x proximity;
+}
+.note-panel {
+    flex: 0 0 min(80ch, calc(100vw - 4ch));
+    min-width: 0;
+    height: 100%;
+    padding-right: 1ch;
+    overflow-y: auto;
+    scroll-snap-align: start;
+}
+.note-panel:first-child { margin-left: max(0px, calc((100% - 80ch) / 2)); }
+.note-panel:last-child { margin-right: 2ch; }
+.note-panel + .note-panel {
+    padding-left: 2ch;
+    border-left: 1px solid #dddddf;
+    animation: note-enter 200ms cubic-bezier(.19, 1, .22, 1) both;
+}
+.note-panel-tools { position: sticky; top: 0; z-index: 1; display: flex; justify-content: flex-end; height: 0; }
+.note-panel-close {
+    width: 1.8rem;
+    height: 1.8rem;
+    border: 1px solid #d5d5d0;
+    border-radius: 50%;
+    background: #fff;
+    color: #555;
+    cursor: pointer;
+    font: 400 1rem/1 "Open Sans", sans-serif;
+}
+.note-panel-close:hover { border-color: #6c02c9; color: #6c02c9; }
+.note-loading { color: #828282; font-family: "Open Sans", sans-serif; }
+
+@keyframes note-enter {
+    from { opacity: .35; transform: translateX(2rem); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+@media (max-width: 800px) {
+    .article-page { padding: 1rem; }
+    .note-stack { gap: 1rem; height: calc(100dvh - 6rem); }
+    .note-panel { flex-basis: calc(100vw - 2rem); padding-right: .5rem; }
+    .note-panel:first-child { margin-left: 0; }
+    .note-panel + .note-panel { padding-left: 1rem; }
+    .note-panel:last-child { margin-right: 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .note-stack { scroll-behavior: auto; }
+    .note-panel + .note-panel { animation: none; }
+}
+
+
 
 .about-ava { float: left; margin-right: 2ch; display: inline;}
 

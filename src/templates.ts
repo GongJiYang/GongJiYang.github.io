@@ -11,13 +11,14 @@ const navTexts: Record<Language, { about: string; blogroll: string; home: string
   zh: { home: "首页", about: "关于", blogroll: "博客列表", write: "写作", switchLang: "EN" },
 };
 export const base = (
-  { content, src, title, path, description, extra_css, showLangSwitch = false, showEditLink = true }: {
+  { content, src, title, path, description, extra_css, body_class, showLangSwitch = false, showEditLink = true }: {
     content: HtmlString;
     src: string;
     title: string;
     description: string;
     path: string;
     extra_css?: string;
+    body_class?: string;
     showLangSwitch?: boolean;
     showEditLink?: boolean;
   },
@@ -33,37 +34,48 @@ export const base = (
   <meta name="description" content="${description}">
   <link rel="icon" href="/favicon.png" type="image/png">
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/css/EBGaramond-400-Normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/css/OpenSans-300-Normal.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="canonical" href="${site_url}${path}">
   <link rel="alternate" type="application/rss+xml" title="Jay67" href="${site_url}/feed.xml">
   <style>
   @font-face {
     font-family: 'Open Sans'; src: url('/css/OpenSans-300-Normal.woff2') format('woff2');
     font-weight: 300; font-style: normal;
+    font-display: optional;
   }
   @font-face {
     font-family: 'JetBrains Mono'; src: url('/css/JetBrainsMono-400-Normal.woff2') format('woff2');
     font-weight: 400; font-style: normal;
+    font-display: optional;
   }
   @font-face {
     font-family: 'JetBrains Mono'; src: url('/css/JetBrainsMono-700-Normal.woff2') format('woff2');
     font-weight: 700; font-style: normal;
+    font-display: optional;
   }
   @font-face {
     font-family: 'EB Garamond'; src: url('/css/EBGaramond-400-Normal.woff2') format('woff2');
     font-weight: 400; font-style: normal;
+    font-display: optional;
   }
   @font-face {
     font-family: 'EB Garamond'; src: url('/css/EBGaramond-400-Italic.woff2') format('woff2');
     font-weight: 400; font-style: italic;
+    font-display: optional;
   }
   @font-face {
     font-family: 'EB Garamond'; src: url('/css/EBGaramond-700-Normal.woff2') format('woff2');
     font-weight: 700; font-style: normal;
+    font-display: optional;
   }
   @font-face {
     font-family: 'EB Garamond'; src: url('/css/EBGaramond-700-Italic.woff2') format('woff2');
     font-weight: 700; font-style: italic;
+    font-display: optional;
   }
+
+  html { font-family: "EB Garamond", serif; font-size: 22px; line-height: 1.3em; }
 
   * { box-sizing: border-box; margin: 0; padding: 0; margin-block-start: 0; margin-block-end: 0; }
 
@@ -92,7 +104,7 @@ export const base = (
   ${extra_css ? html`<link rel="stylesheet" href="/css/${extra_css}">` : ""}
 </head>
 
-<body>
+<body${body_class ? ` class="${body_class}"` : ""}>
   <header>
     <nav>
       <a class="title" href="${lang === "en" ? "/" : "/CN/"}">${navTexts[lang].home}</a>
@@ -186,6 +198,8 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
       details: "Publishing details",
       slug: "Slug",
       slugPlaceholder: "untitled-post",
+      tags: "Tags",
+      tagsPlaceholder: "software, tools",
       date: "Date",
       language: "Language",
       newDraft: "New draft",
@@ -194,6 +208,7 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
       fillAll: "Add a title, slug, date, and some writing first.",
       badSlug: "Use letters, numbers, and single hyphens in the slug.",
       badDate: "Use a real date in YYYY-MM-DD format.",
+      badTags: "Use up to 8 comma-separated tags; each may contain letters, numbers, spaces, underscores, or hyphens.",
       placeholder: "Start writing in Markdown…",
       fallbackNotice: "Live preview could not load. Plain-text editing is still available.",
       openingIssue: "Preparing GitHub…",
@@ -226,6 +241,8 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
       details: "发布信息",
       slug: "Slug",
       slugPlaceholder: "文章地址",
+      tags: "标签",
+      tagsPlaceholder: "软件, 工具",
       date: "日期",
       language: "语言",
       newDraft: "新建草稿",
@@ -234,6 +251,7 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
       fillAll: "请先填写标题、slug、日期和正文。",
       badSlug: "Slug 只能使用文字、数字和单个连字符。",
       badDate: "请输入 YYYY-MM-DD 格式的真实日期。",
+      badTags: "最多填写 8 个逗号分隔的标签；每个标签可使用文字、数字、空格、下划线或连字符。",
       placeholder: "开始用 Markdown 写作…",
       fallbackNotice: "实时预览加载失败，仍可继续纯文本写作。",
       openingIssue: "正在准备 GitHub…",
@@ -360,7 +378,7 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
 
     .meta-grid {
       display: grid;
-      grid-template-columns: minmax(0, 1.5fr) minmax(9rem, .85fr) minmax(8rem, .65fr);
+      grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr) minmax(9rem, .85fr) minmax(8rem, .65fr);
       gap: .7rem 1rem;
       margin-top: .85rem;
     }
@@ -649,6 +667,11 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
               <label for="post-slug">${text.slug}</label>
               <input id="post-slug" type="text" autocomplete="off" placeholder="${text.slugPlaceholder}">
             </div>
+            <div class="write-field">
+              <label for="post-tags">${text.tags}</label>
+              <input id="post-tags" type="text" autocomplete="off" placeholder="${text.tagsPlaceholder}">
+            </div>
+
 
             <div class="write-field">
               <label for="post-date">${text.date}</label>
@@ -704,6 +727,7 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
       (() => {
         const titleEl = document.getElementById("post-title");
         const slugEl = document.getElementById("post-slug");
+        const tagsEl = document.getElementById("post-tags");
         const dateEl = document.getElementById("post-date");
         const langEl = document.getElementById("post-lang");
         const statusEl = document.getElementById("write-status");
@@ -718,11 +742,12 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
         const publishBtn = document.getElementById("publish-issue");
         const editorHost = document.getElementById("post-editor");
 
-        if (!titleEl || !slugEl || !dateEl || !langEl || !statusEl || !wordCountEl || !draftStateEl || !newDraftBtn || !imageBtn || !imagePanel || !imageUrlEl || !imageAltEl || !cancelImageBtn || !publishBtn || !editorHost) return;
+        if (!titleEl || !slugEl || !tagsEl || !dateEl || !langEl || !statusEl || !wordCountEl || !draftStateEl || !newDraftBtn || !imageBtn || !imagePanel || !imageUrlEl || !imageAltEl || !cancelImageBtn || !publishBtn || !editorHost) return;
 
         const TEXT = {
           fillAll: ${JSON.stringify(text.fillAll)},
           badSlug: ${JSON.stringify(text.badSlug)},
+          badTags: ${JSON.stringify(text.badTags)},
           badDate: ${JSON.stringify(text.badDate)},
           fallbackNotice: ${JSON.stringify(text.fallbackNotice)},
           openingIssue: ${JSON.stringify(text.openingIssue)},
@@ -766,6 +791,13 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
         const validSlug = (value) =>
           value.length <= 80 &&
           /^[\\p{L}\\p{N}]+(?:-[\\p{L}\\p{N}]+)*$/u.test(value);
+        const parseTags = (value) =>
+          [...new Set(value.split(",").map(tag => tag.trim()).filter(Boolean))];
+
+        const validTags = (tags) =>
+          tags.length <= 8 &&
+          tags.every(tag => /^[\\p{L}\\p{N}][\\p{L}\\p{N} _-]{0,31}$/u.test(tag));
+
 
         const localDate = () => {
           const now = new Date();
@@ -798,16 +830,17 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
 
         titleEl.value = typeof draft.title === "string" ? draft.title : "";
         slugEl.value = typeof draft.slug === "string" ? draft.slug : "";
+        tagsEl.value = typeof draft.tags === "string" ? draft.tags : "";
         dateEl.value = typeof draft.date === "string" && validDate(draft.date) ? draft.date : localDate();
         langEl.value = draft.lang === "en" || draft.lang === "zh" ? draft.lang : PAGE_LANG;
         const initialBody = typeof draft.body === "string" ? draft.body : "";
-        const hasDraft = Boolean(titleEl.value || slugEl.value || initialBody);
+        const hasDraft = Boolean(titleEl.value || slugEl.value || tagsEl.value || initialBody);
         if (hasDraft) draftStateEl.textContent = TEXT.draftRestored;
 
         let slugTouched = Boolean(slugEl.value);
         let publishing = false;
 
-        const buildIssue = ({ title, slug, date, lang, body }) => {
+        const buildIssue = ({ title, slug, tags, date, lang, body }) => {
           const issueTitlePrefix = lang === "zh" ? "[publish-zh]" : "[publish]";
           const issueTitle = issueTitlePrefix + " " + date + " " + slug + " " + title;
           const meta = {
@@ -815,6 +848,7 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
             title,
             slug,
             date,
+            tags,
             lang,
           };
           const issueBody = "<!-- blog-publish:v2 " + JSON.stringify(meta) + " -->\\n\\n" + body;
@@ -830,6 +864,7 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
           const snapshot = () => JSON.stringify({
             title: titleEl.value,
             slug: slugEl.value,
+            tags: tagsEl.value,
             date: dateEl.value,
             lang: langEl.value,
             body: getBody(),
@@ -882,6 +917,7 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
             slugTouched = Boolean(slugEl.value);
             changed();
           });
+          tagsEl.addEventListener("input", changed);
 
           dateEl.addEventListener("input", changed);
           langEl.addEventListener("change", changed);
@@ -925,11 +961,12 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
           });
 
           newDraftBtn.addEventListener("click", () => {
-            const hasContent = Boolean(titleEl.value.trim() || getBody().trim());
+            const hasContent = Boolean(titleEl.value.trim() || tagsEl.value.trim() || getBody().trim());
             if (hasContent && !window.confirm(TEXT.resetConfirm)) return;
             window.clearTimeout(saveTimer);
             titleEl.value = "";
             slugEl.value = "";
+            tagsEl.value = "";
             dateEl.value = localDate();
             langEl.value = PAGE_LANG;
             slugTouched = false;
@@ -949,6 +986,7 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
 
             const title = titleEl.value.trim();
             const slug = slugEl.value.trim();
+            const tags = parseTags(tagsEl.value);
             const date = dateEl.value;
             const selectedLang = langEl.value;
             const body = getBody().trim();
@@ -956,13 +994,14 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
             if (!title || !slug || !date || !body) return setStatus(TEXT.fillAll, false);
             if (!validSlug(slug)) return setStatus(TEXT.badSlug, false);
             if (!validDate(date)) return setStatus(TEXT.badDate, false);
+            if (!validTags(tags)) return setStatus(TEXT.badTags, false);
 
             publishing = true;
             publishBtn.disabled = true;
             setStatus(TEXT.openingIssue, false);
             saveDraft();
 
-            const handoff = buildIssue({ title, slug, date, lang: selectedLang, body });
+            const handoff = buildIssue({ title, slug, tags, date, lang: selectedLang, body });
             const opened = window.open("about:blank", "_blank");
             if (!opened) {
               publishing = false;
@@ -1088,34 +1127,217 @@ export const write_page = (lang: "en" | "zh"): HtmlString => {
 
 export const post_list = (posts: Post[], lang: "en" | "zh"): HtmlString => {
   const prefix = lang === "en" ? "" : "/CN";
-  const list_items = posts.map((post) =>
+  const postItem = (post: Post) =>
     html`
   <li>
     <h2>${time(post.date, "meta")} <a href="${prefix}${post.path}">${post.title}</a></h2>
-  </li>`
-  );
+  </li>`;
+  const listItems = posts.map(postItem);
+
+  const postsByTag = new Map<string, Post[]>();
+  for (const post of posts) {
+    const tags = post.tags.length ? post.tags : [lang === "en" ? "Untagged" : "未分类"];
+    for (const tag of tags) {
+      const taggedPosts = postsByTag.get(tag) ?? [];
+      taggedPosts.push(post);
+      postsByTag.set(tag, taggedPosts);
+    }
+  }
+  const tagGroups = [...postsByTag.entries()]
+    .sort(([left], [right]) => left.localeCompare(right, lang))
+    .map(([tag, taggedPosts]) =>
+      html`
+      <section class="tag-group" id="tag-${encodeURIComponent(tag)}">
+        <h2>#${tag}</h2>
+        <ul>
+          ${taggedPosts.map(post => html`<li><a href="${prefix}${post.path}">${post.title}</a></li>`)}
+        </ul>
+      </section>`
+    );
 
   return base({
     path: prefix ? `${prefix}/` : "/",
     title: "Jay67",
     description: blurb,
     src: "/src/templates.ts",
-    content: html`<ul class="post-list">${list_items}</ul>`,
+    body_class: "home-page",
+    content: html`
+      <ul class="post-list">${listItems}</ul>
+      <section class="tag-index" aria-labelledby="tag-index-title">
+        <h1 id="tag-index-title">${lang === "en" ? "Tags" : "标签"}</h1>
+        <div class="tag-groups">${tagGroups}</div>
+      </section>
+    `,
     showLangSwitch: true,
   }, lang);
 };
 
 export function post(post: Post, spellcheck: boolean, lang: "en" | "zh"): HtmlString {
   const prefix = lang === "en" ? "" : "/CN";
+  const postPath = `${prefix}${post.path}`;
+  const labels = lang === "en"
+    ? { close: "Close reference", loading: "Loading referenced article…" }
+    : { close: "关闭引用文章", loading: "正在加载引用文章…" };
   return base({
     src: post.src,
     title: post.title,
     description: post.summary,
-    path: `${prefix}${post.path}`,
+    path: postPath,
+    body_class: "article-page",
     content: html`
-      <article ${spellcheck ? 'contentEditable="true"' : ""}>
-        ${post.content}
-      </article>
+      <div class="note-stack" data-note-stack>
+        <article class="note-panel" data-note-url="${postPath}" ${spellcheck ? 'contentEditable="true"' : ""}>
+          ${post.content}
+        </article>
+      </div>
+      <script>
+        (() => {
+          const stack = document.querySelector("[data-note-stack]");
+          if (!stack || !window.fetch || !window.DOMParser) return;
+
+          const ARTICLE_PATH = /^\\/(?:CN\\/)?\\d{4}\\/\\d{2}\\/\\d{2}\\/[^/]+\\.html$/;
+          const LABELS = ${JSON.stringify(labels)};
+          const cache = new Map();
+          const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+          const panels = () => Array.from(stack.querySelectorAll(".note-panel"));
+          const panelPaths = () => panels().map(panel => panel.dataset.noteUrl);
+
+          const trimAfter = (index) => {
+            panels().slice(index + 1).forEach(panel => panel.remove());
+            document.body.classList.toggle("has-note-stack", panels().length > 1);
+          };
+
+          const scrollToPanel = (panel) => {
+            stack.scrollTo({
+              left: panel.offsetLeft - stack.offsetLeft,
+              behavior: reducedMotion ? "auto" : "smooth",
+            });
+          };
+
+          const loadNote = async (path) => {
+            if (cache.has(path)) return cache.get(path);
+            const response = await fetch(path, { headers: { Accept: "text/html" } });
+            if (!response.ok) throw new Error("Could not load article");
+            const page = new DOMParser().parseFromString(await response.text(), "text/html");
+            const article = page.querySelector("main article");
+            if (!article) throw new Error("Article content missing");
+
+            for (const [selector, attribute] of [
+              ["a[href]", "href"],
+              ["img[src]", "src"],
+              ["source[src]", "src"],
+              ["video[poster]", "poster"],
+            ]) {
+              article.querySelectorAll(selector).forEach(element => {
+                const value = element.getAttribute(attribute);
+                if (value && !value.startsWith("data:")) {
+                  element.setAttribute(attribute, new URL(value, response.url).href);
+                }
+              });
+            }
+
+            const note = { html: article.innerHTML, title: page.title };
+            cache.set(path, note);
+            return note;
+          };
+
+          const appendPanel = async (path, focusPanel = true) => {
+            const panel = document.createElement("article");
+            panel.className = "note-panel";
+            panel.dataset.noteUrl = path;
+            panel.tabIndex = -1;
+            panel.setAttribute("aria-busy", "true");
+            panel.innerHTML = '<p class="note-loading">' + LABELS.loading + "</p>";
+            stack.append(panel);
+            document.body.classList.add("has-note-stack");
+            requestAnimationFrame(() => scrollToPanel(panel));
+
+            try {
+              const note = await loadNote(path);
+              if (!panel.isConnected) return null;
+              panel.setAttribute("aria-label", note.title);
+              panel.removeAttribute("aria-busy");
+              panel.innerHTML =
+                '<nav class="note-panel-tools"><button class="note-panel-close" type="button" data-note-close aria-label="' +
+                LABELS.close + '">×</button></nav>' + note.html;
+              if (focusPanel) panel.focus({ preventScroll: true });
+              return panel;
+            } catch {
+              panel.remove();
+              window.location.assign(path);
+              return null;
+            }
+          };
+
+          stack.addEventListener("click", async (event) => {
+            const closeButton = event.target.closest("[data-note-close]");
+            if (closeButton) {
+              const panel = closeButton.closest(".note-panel");
+              const index = panels().indexOf(panel);
+              if (index > 0) {
+                trimAfter(index - 1);
+                const previous = panels().at(-1);
+                history.pushState({ noteStack: panelPaths() }, "", previous.dataset.noteUrl);
+                scrollToPanel(previous);
+                previous.focus({ preventScroll: true });
+              }
+              return;
+            }
+
+            const anchor = event.target.closest("a[href]");
+            if (!anchor || event.defaultPrevented || event.button !== 0 ||
+                event.metaKey || event.ctrlKey || event.shiftKey || event.altKey ||
+                (anchor.target && anchor.target !== "_self")) return;
+
+            const target = new URL(anchor.href, window.location.href);
+            if (target.origin !== window.location.origin || !ARTICLE_PATH.test(target.pathname)) return;
+
+            const sourcePanel = anchor.closest(".note-panel");
+            const sourceIndex = panels().indexOf(sourcePanel);
+            if (sourceIndex < 0 || sourcePanel.dataset.noteUrl === target.pathname) return;
+            event.preventDefault();
+            trimAfter(sourceIndex);
+
+            const existingIndex = panels().findIndex(panel => panel.dataset.noteUrl === target.pathname);
+            if (existingIndex >= 0) {
+              trimAfter(existingIndex);
+              const existing = panels()[existingIndex];
+              history.pushState({ noteStack: panelPaths() }, "", target.pathname);
+              scrollToPanel(existing);
+              existing.focus({ preventScroll: true });
+              return;
+            }
+
+            const panel = await appendPanel(target.pathname);
+            if (panel) history.pushState({ noteStack: panelPaths() }, "", target.pathname);
+          });
+
+          const restoreStack = async (paths) => {
+            const current = panelPaths();
+            let common = 0;
+            while (common < current.length && common < paths.length && current[common] === paths[common]) common++;
+            if (common === 0) {
+              window.location.assign(paths.at(-1));
+              return;
+            }
+            trimAfter(common - 1);
+            for (const path of paths.slice(common)) {
+              if (!await appendPanel(path, false)) return;
+            }
+            const activePanel = panels().at(-1);
+            scrollToPanel(activePanel);
+            activePanel.focus({ preventScroll: true });
+          };
+
+          history.replaceState({ noteStack: panelPaths() }, "", window.location.href);
+          window.addEventListener("popstate", event => {
+            if (Array.isArray(event.state?.noteStack) && event.state.noteStack.length) {
+              restoreStack(event.state.noteStack);
+            }
+          });
+        })();
+      </script>
     `,
   }, lang);
 }
