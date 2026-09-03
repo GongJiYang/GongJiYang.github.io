@@ -33,7 +33,17 @@ if (!uid_output.success) {
   throw new Error("Unable to determine the current user ID");
 }
 const domain = `gui/${decoder.decode(uid_output.stdout).trim()}`;
-const deno = Deno.execPath();
+let deno = Deno.execPath();
+for (const candidate of ["/opt/homebrew/bin/deno", "/usr/local/bin/deno"]) {
+  try {
+    if (await Deno.realPath(candidate) === deno) {
+      deno = candidate;
+      break;
+    }
+  } catch (error) {
+    if (!(error instanceof Deno.errors.NotFound)) throw error;
+  }
+}
 const path = `${
   deno.slice(0, deno.lastIndexOf("/"))
 }:/usr/local/bin:/usr/bin:/bin`;
