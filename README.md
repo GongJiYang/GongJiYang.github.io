@@ -18,7 +18,7 @@ First paragraph used as the feed summary.
 
 The source remains a normal `.md` file for Typora. The generator accepts both `.md` and upstream `.dj` sources. Images pasted by Typora go to `content/assets`; `../assets/image.png` is rewritten to `/assets/image.png` while rendering.
 
-Typora is configured globally with macOS native autosave enabled, relative image paths enabled, local-image copying enabled, and `../assets` as the image destination. Open `/tmp/GongJiYang.github.io/content/posts` in Typora, save a correctly named `.md` file, and write normally.
+Typora is configured globally with macOS native autosave enabled, relative image paths enabled, local-image copying enabled, and `../assets` as the image destination. Open `~/GongJiYang.github.io/content/posts` in Typora, save a correctly named `.md` file, and write normally.
 
 A macOS LaunchAgent (`com.gongjiyang.blog-autopublish`) runs `tools/autopublish.ts` after the writing tree has been idle for ten minutes. It validates the build, commits post and image changes, rebases on `origin/main`, and pushes. GitHub Actions builds and deploys the site. Build failures are logged without committing or pushing to `~/Library/Logs/gongjiyang-blog-autopublish.log`.
 
