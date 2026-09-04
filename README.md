@@ -87,7 +87,7 @@ delete: true
 
 ## 本地使用
 
-需要 Deno 2、Git，以及已经配置好 GitHub 写入权限的 `origin` 远端。Typora
+需要 Deno 2、Git、GitHub CLI，以及已经配置好写入权限的 `origin` 远端。Typora
 快捷操作和 LaunchAgent 仅用于 macOS；站点构建本身可在其他系统运行。
 
 ```console
@@ -100,6 +100,19 @@ deno task serve
 # 立即执行一次自动发布检查
 deno task autopublish
 ```
+
+### GitHub 登录
+
+第一次使用时登录一次：
+
+```console
+gh auth login --hostname github.com --git-protocol https
+```
+
+访问令牌由 GitHub CLI 保存在 macOS 钥匙串中，不写入仓库或 LaunchAgent 配置。
+`deno task install-autopublish` 会把 GitHub CLI 设置为 Git
+的凭据助手；后台发布会自动 从钥匙串取得令牌。LaunchAgent 同时禁用 Git
+的交互式密码提示：令牌失效时只写入日志， 不会每十分钟弹出密码窗口。
 
 ## LaunchAgent
 
@@ -121,7 +134,8 @@ launchctl print gui/$(id -u)/com.gongjiyang.blog-autopublish
 tail -f ~/Library/Logs/gongjiyang-blog-autopublish.log
 ```
 
-安装器会卸载旧配置、根据当前目录和 Deno 路径重新生成 plist，然后启动新配置。
+安装器会配置 GitHub CLI 凭据助手、卸载旧配置，根据当前目录和 Deno 路径重新生成
+plist，然后启动新配置。
 
 ## 部署
 

@@ -67,6 +67,8 @@ const plist = `<?xml version="1.0" encoding="UTF-8"?>
   <dict>
     <key>PATH</key>
     <string>${xml(path)}</string>
+    <key>GIT_TERMINAL_PROMPT</key>
+    <string>0</string>
   </dict>
   <key>RunAtLoad</key>
   <true/>
@@ -82,6 +84,7 @@ const plist = `<?xml version="1.0" encoding="UTF-8"?>
 </plist>
 `;
 
+await run("gh", ["auth", "setup-git", "--hostname", "github.com"]);
 await Deno.mkdir(`${home}/Library/LaunchAgents`, { recursive: true });
 await Deno.mkdir(`${home}/Library/Logs`, { recursive: true });
 await Deno.writeTextFile(plist_path, plist);
