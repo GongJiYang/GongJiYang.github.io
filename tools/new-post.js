@@ -19,6 +19,12 @@ function shellQuote(value) {
   return `'${value.replace(/'/g, `'\\''`)}'`;
 }
 
+function isCanceled(error) {
+  const message = error && error.message ? String(error.message) : "";
+  return Number(error.number) === -128 ||
+    /用户已取消|User cancel(?:ed|led)/i.test(`${String(error)} ${message}`);
+}
+
 function articleTitle() {
   while (true) {
     const title = prompt("文章标题", "", "下一步").trim();
@@ -97,7 +103,7 @@ function run(argv) {
     const directory = argv[2] || postsDirectory;
     return createPost(title, tags, directory, interactive);
   } catch (error) {
-    if (error.number === -128 || String(error).includes("(-128)")) return "";
+    if (isCanceled(error)) return "";
     if (argv.length === 0) {
       app.displayAlert("创建失败", { message: String(error) });
     }
