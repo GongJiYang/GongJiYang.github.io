@@ -1,5 +1,5 @@
 ---
-tags: Language
+tags: 编程范式
 ---
 
 # Seven Languages in Seven Weeks
@@ -60,13 +60,11 @@ Io 可以说是一种不依赖类的、基于原型的小型动态语言。所�
 
 自 2026 年 4 月以后，既定的实现方式将是使用 WebAssembly（WASI）。相同的二进制代码可以在 wasmtime、Node.js 以及浏览器环境中运行。
 
-DSL = Domain-Specific Language，领域特定语言
+Io 的源代码通常是以 `.io` 为扩展名的格式编写的。编译器会生成以 C 语言编写的虚拟机，该虚拟机负责解析消息树。目前的默认构建方式是将这种虚拟机转换为 WebAssembly 格式。
 
-在编程语言（特别是你提到的 **Io 语言**）的语境下，**`forward`** 是一个非常强大的元编程特性，通常被称为**“前向引导”**或**“消息转发”**。
+在 WASM 中，并没有像 npm 或 Cargo 这样的中央包管理工具。标准库被包含在发行版中，而主机端的功能则通过 JavaScript 的相互调用来实现。 `DynLib` 、 `AddonLoader` 以及 Eerie 提供的原生插件在 WASM 中是无法使用的。
 
-简单来说，它的作用是：**“当一个对象收到它不知道如何处理的消息时，该怎么办？”**
-
-以下是详细解释：
+相应地，核心中的组件是 Importer。每当遇到同名文件时，它会自动在第一次被引用时加载该文件。默认的搜索路径是当前目录，可以使用 `addSearchPath()` 来添加额外的路径。
 
 在 Io 语言中，当你向一个对象发送一个消息（调用一个方法），如果该对象及其原型链中都没有定义这个方法，Io 解释器不会立即抛出错误，而是会去寻找一个名为 `forward` 的特殊方法。
 
@@ -78,6 +76,7 @@ DSL = Domain-Specific Language，领域特定语言
 
 **举个例子：**
 假设你想用 Io 写 HTML。你可能想直接写 `html(body(h1("Hello")))`。
+
 *   通常情况下，如果你的代码里没定义 `html`、`body` 或 `h1` 这些方法，程序会崩溃。
 *   但是，如果你定义了 `forward` 方法，你可以让它拦截这些“不存在的方法名”。
 *   当调用 `html(...)` 时，`forward` 被触发，它拿到“html”这个名字，然后自动生成一个 `<html ...>` 标签。
@@ -110,12 +109,3 @@ Furture 和 线程 不是一回事,Future 主要描述的是“结果”，而�
 
 Future一种“表示尚未完成计算结果”的抽象。
 
-### 2026
-
-- WebAssembly
-  - Io 主线现在以 **WASM/WASI** 为目标，一个 WASI binary 可以运行在 Wasmtime、Node 等 WASI host 上。
--  浏览器运行
-  - 已经有 `io_browser.wasm`，并提供浏览器 REPL.
-- Io ↔ JavaScript
-  - 新路线提供双向 JavaScript bridge：Io 可以调用 JS，JS 也可以调用 Io。
-- 
