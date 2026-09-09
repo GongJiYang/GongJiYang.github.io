@@ -11,3 +11,6 @@ tags: 方法论
 - 《learning how to learn》
 - 《make it stick》
 - 《Atomic Habits》
+
+会以小节形式记录一些新的方法思想或者高效的工作流.
+
