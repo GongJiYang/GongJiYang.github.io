@@ -27,6 +27,14 @@ async function git_output(args: string[]): Promise<Deno.CommandOutput> {
     stderr: "inherit",
   }).output();
 }
+const ahead = await git_output(["rev-list", "--count", "origin/main..HEAD"]);
+if (ahead.success && decoder.decode(ahead.stdout).trim() !== "0") {
+  console.log("Retrying unpublished local commit");
+  await run("git", ["pull", "--rebase", "origin", "main"]);
+  await run("git", ["push", "origin", "main"]);
+  Deno.exit(0);
+}
+
 
 const status = await git_output([
   "status",
