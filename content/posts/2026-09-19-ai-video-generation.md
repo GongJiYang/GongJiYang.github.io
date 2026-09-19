@@ -66,17 +66,17 @@ https://github.com/NomaDamas/CozyClay,没想到我思考的实现刚有雏形,�
 
 还有一个有意思的点,这篇文章找到了支持白模的模型并会持续更新,目前只有Seedance 2.5、Kling、Veo.
 
+主流托管 API（Seedance、Kling、Veo 3.1、Runway Act-Two、MiniMax）都没有文档说明支持深度或姿态控制视频。它们接收的是首帧图，部分模型还接收一段普通 RGB 灰模参考视频。所以渲染器首要输出应该是**平涂 RGB 的灰模静帧和短片**，深度图只在走开源 ControlNet 类模型时才需要。
+
 不管怎么说这个项目非常酷,我会进一步了解,也许会单独写一篇文章.
 
 level 2 :  Micheal Lanham 的 Seedance 系列
 
 
 
-
-
 参考:
 
-**CozyClay《Greybox to AI video — block it grey, then generate》
+**CozyClay《Greybox to AI video — block it grey, then generate》**
 
 - 链接：https://cozyclay.org/greybox-to-video/
 - 内容：系统讲解什么是greybox/white-model、如何用简单方块做预演、哪些模型真正支持白模参考（Seedance 2.5最强）、完整block-then-generate循环。文字+案例极佳，强烈建议先看这篇建立正确认知。
