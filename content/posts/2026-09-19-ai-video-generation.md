@@ -95,3 +95,11 @@ level 2 :  Micheal Lanham 的 Seedance 系列
 
 - 链接：https://www.nvidia.com/en-us/geforce/news/rtx-ai-video-generation-guide/
 - 内容：Blender + ComfyUI + LTX 2.3本地工作流，用3D白模引导生成，最后RTX超分到4K。完全本地、零生成费用。
+
+---
+
+## 挖掘
+
+Stable Diffusion LoRA 训练
+
+comfy ui 节点
