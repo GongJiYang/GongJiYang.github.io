@@ -218,3 +218,119 @@ Hi [名字]，
 
 ---
 
+## AI Support & Ops Automation for Shopify / WooCommerce Stores`
+
+把前面讨论的几个方向合并到**同一类客户**身上。主线是 n8n 自动化加知识库客服，副线是给同一批客户做 AI 商品视频。这样选的原因：
+
+1. **客户在线上、说英语、会主动搜解决方案**。"退货邮件太多""订单状态天天有人问"这类问题一句话就能说清，符合被动接单的第一个条件。
+2. **需求天然持续**：客服量每天都有，维护和包月比一次性交付更容易谈下来。
+3. **市场碎片化**：每家店用的工具组合都不一样（Gmail、Gorgias、Klaviyo、Sheets 等），大 SaaS 很难做到一刀切，这正是做"连接各种工具"的集成者的机会。
+4. **你有非对称优势**：大量独立站卖家是中国跨境商家，中英双语就是你的差异化。
+5. **一个客户能卖两次**：先做客服自动化，再追加商品视频素材。
+
+**需要清醒的风险**：Shopify 自带 AI 功能，也有成熟的客服 SaaS。所以不要定位成"替代它们"，而是"把客户已有的工具串起来、配置好、维护好"。
+
+##  Demo 基础仓库
+
+**核心原则**：这些仓库是**地基**，不是作品。你要做的是 fork 或参照它们，改造成**你自己的仓库**，用一家虚构的店铺做演示，README 写成销售页。客户看到你 fork 了热门项目并不会加分，看到"这个能解决我的问题"才会。
+
+| #    | 仓库                                                         | 用途                 | 你要在上面做出的 Demo       |
+| ---- | ------------------------------------------------------------ | -------------------- | --------------------------- |
+| 1    | https://github.com/n8n-io/self-hosted-ai-starter-kit         | 环境底座             | 统一的演示和交付环境        |
+| 2    | https://github.com/enescingoz/awesome-n8n-templates          | 工作流素材库         | 售后邮件自动分类 + 回复草稿 |
+| 3    | https://github.com/vercel/chatbot                            | 可在线体验的聊天前端 | 商店 FAQ 和订单查询机器人   |
+| 4    | https://github.com/twilio-samples/speech-assistant-openai-realtime-api-python | 电话 AI 的最小实现   | 虚构商店的售后热线          |
+| 5    | https://github.com/harry0703/MoneyPrinterTurbo               | 副线：批量短视频     | 商品短视频批量生成          |
+| 6    | https://github.com/nextjs/saas-starter                       | 阶段二：产品化       | 客户门户或小型 SaaS         |
+
+### 各仓库选择理由
+
+**1. n8n 官方 AI 起步套件**
+
+- 由 n8n 官方维护，用 Docker Compose 一键搭好本地 AI 加低代码开发环境。
+- 包含自托管的 n8n、Ollama、Qdrant 向量库和 PostgreSQL，约 1.5 万 star，Apache-2.0 许可证。
+- 选它的理由：你所有 Demo 都跑在这一套上，环境统一。而且"数据不出你的服务器"本身就是可以卖给注重隐私的客户的卖点。
+- 注意：官方说明它不是为生产环境优化的，适合做概念验证。交付给客户时要换成正式部署。
+
+**2. awesome-n8n-templates**
+
+- 收录 280 多个免费 n8n 模板，约 2.4 万 star。
+- 里面有你能直接参考的素材：Gmail 用 AI 生成回复草稿、"人工审核后再发送"的邮件回复系统，以及一个 WooCommerce 的 AI 客服 Agent。
+- 选它的理由：不用从零写工作流，把这几个拼起来就是"电商售后邮件自动化"的雏形。
+- **重要提醒**：仓库作者声明这些模板是从网上收集的，并非他本人创作，版权归原作者。所以**不要原样搬运当作自己的作品**。参考思路后自己重建，并在 README 里注明来源。
+
+**3. Vercel 官方聊天机器人模板**
+
+- 基于 Next.js 和 AI SDK 的开源聊天应用模板，约 2.1 万 star。
+- 支持切换 OpenAI、Anthropic 等多家模型提供商，可以一键部署到 Vercel。
+- 选它的理由：客户能**直接在网页上聊**，这比任何截图都有说服力。你要做的是接入虚构店铺的 FAQ 和订单数据。
+- 注意：用于商业交付前，自己确认一下它的许可证条款。
+
+**4. Twilio 官方电话 AI 示例**
+
+- 演示如何用 Python、Twilio 语音和 OpenAI 的 Realtime API 实现拨打电话与 AI 对话。MIT 许可证。
+- 代码量很小，已经处理好了"用户插话时打断 AI"的逻辑。Twilio 官方还配有一篇教程文章。
+- 选它的理由：代码少、好读，适合 AI 辅助改造。做一个客户能真实拨打的号码，演示效果非常强。
+- **进阶选项**：需要更复杂的对话流程时，可以换 https://github.com/pipecat-ai/pipecat。它是专门做实时语音和多模态 Agent 的开源 Python 框架，约 1.5 万 star，BSD-2 许可证。
+
+**5. MoneyPrinterTurbo（副线）**
+
+- 输入主题或关键词，自动生成脚本、匹配素材、配字幕和背景音乐，合成短视频。约 12.4 万 star，MIT 许可证，作者是国内开发者，有中文文档。
+- 支持批量生成，也能自动发布到 TikTok、Instagram 和 YouTube Shorts。
+- 选它的理由：可以改造成"商品表格 → 批量商品短视频"，作为追加销售的产品。
+- **商用前必须处理的版权问题**：项目自带的默认背景音乐来自 YouTube 视频，作者也注明了"如有侵权请删除"。**给客户交付前必须换成有授权的音乐**，素材库的授权条款也要逐一确认。
+
+**6. Next.js SaaS 起步模板（阶段二再用）**
+
+- 带登录、Stripe 支付和用户后台的 SaaS 模板，技术栈是 Next.js、Postgres、Drizzle 和 Stripe，MIT 许可证。
+- 选它的理由：等你有 10 个以上客户、流程固定下来之后，可以把重复的配置做成客户自助门户或小工具，这是从接单走向被动收入的下一步。
+- 注意：官方说明它刻意保持精简，主要定位是学习资源。
+
+---
+
+## 文章推荐
+
+### 技术类
+
+1. **Anthropic《Building effective agents》**
+    https://www.anthropic.com/engineering/building-effective-agents
+    核心观点：成功的实现大多用简单、可组合的模式，而不是复杂框架。文中区分了"预定义流程的 workflow"和"模型自主决策的 agent"，并建议先找最简单的方案。你的大部分单子其实都是 workflow，这篇能帮你避免过度设计。附录专门讲了客服场景为什么适合用 Agent，正好对上你的方向。（注：文章写于 2024 年底，官方已注明部分工具生态有变化，但设计原则仍然适用。）
+2. **Hamel Husain《Your AI Product Needs Evals》**
+    https://hamel.dev/blog/posts/evals/
+    核心观点：失败的 AI 产品几乎都有一个共同根因，就是没有建立评估体系，只靠感觉判断效果。它教你用简单的断言测试加人工抽查来持续改进。**这是你和"只会做 Demo 的人"拉开差距的关键**：交付聊天机器人时附一份测试用例和通过率，客户会立刻觉得你专业。
+3. **n8n 官方 AI 入门教程**
+    https://docs.n8n.io/advanced-ai/intro-tutorial/
+    从零搭一个 AI 工作流，建议最先读。
+4. **Twilio 电话 AI 教程**（对应第 4 个仓库）
+    https://www.twilio.com/en-us/blog/voice-ai-assistant-openai-realtime-api-python
+
+### 安全类
+
+1. **微软《Contagious Interview》**
+    https://www.microsoft.com/en-us/security/blog/2026/03/11/contagious-interview-malware-delivered-through-fake-developer-job-interviews/
+    上一轮提到的"面试投毒"的一手分析，读完你会明白为什么绝不能在主力电脑上运行客户给的代码。
+2. **Upwork 官方防诈骗指南**
+    https://www.upwork.com/resources/upwork-scams
+
+### 接单与商业类
+
+1. **Patrick McKenzie《Don't Call Yourself A Programmer》**
+    https://www.kalzumeus.com/2011/10/28/dont-call-yourself-a-programmer/
+    核心观点：企业雇工程师是为了增加收入或降低成本，而不是为了写代码本身。所以要用"帮客户赚了多少、省了多少"来描述自己，而不是报技术栈。他还强调，沟通是最重要的职业技能，要能把自己的价值讲给非技术的人听。这直接决定了你的简介和投标怎么写。
+2. **Paul Graham《Do Things That Don't Scale》**
+    https://paulgraham.com/ds.html
+    这篇恰好对应你"先主动、后被动"的路径：起步阶段必须手动一个个去找客户，不能等客户上门；先专注一个窄市场，把火烧旺；甚至可以先像顾问一样只为一个客户深度定制，再从中发现别人也需要的东西。
+3. **Indie Hackers：把可重复的两周服务做成年入 170 万美元的咨询公司**
+    https://www.indiehackers.com/post/services/building-a-1-7m-yr-tech-enabled-consultancy-by-productizing-a-repeatable-2-week-service-ss4jghP8eGhgaTs70kks
+    服务产品化的真实路径，评论区的经验同样值得看。
+4. **Ciela：Reddit 上关于 AI 自动化代理的真实讨论**
+    https://ciela.ai/blogs/ai-automation-agency-reddit-honest-truth
+    帮你提前知道失败者常踩的坑：搭建只占 20%，分发和获客占 80%。
+5. **Fiverr 2026 商业趋势报告**
+    https://www.fiverr.com/news/business-trends-index-ai-2026
+    写 Gig 标题时用的关键词（n8n AI automation、AI UGC ads 等），可以直接从这里的数据里挑。
+
+**阅读顺序建议**：7 → 8 → 1 → 3 → 5，这五篇在动手前读完；2、4 在做 Demo 时对照着读；9、10、11 在写简介和定价时再看。
+
+---
+
