@@ -107,6 +107,5 @@ if (staged.code !== 1) Deno.exit(staged.code);
 
 const date = new Date().toISOString().slice(0, 10);
 await run("git", ["commit", "-m", `publish: Typora changes ${date}`]);
-await run("git", ["pull", "--rebase", "origin", "main"]);
 await run("git", ["push", "origin", "main"]);
 console.log("Published Typora changes");
