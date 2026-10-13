@@ -54,7 +54,7 @@ tags: AIGC
 
 了解了大致原理我们从一些文章和实战中继续挖掘一下:
 
-level 1: https://cozyclay.org/greybox-to-video/以及https://cozyclay.org/ai-camera-control/:
+level 1: <https://cozyclay.org/greybox-to-video/> 以及 <https://cozyclay.org/ai-camera-control/>：
 
 这两篇博客分别讲解了白模/灰盒是什么、为什么有效、哪些模型真正支持白模参考、完整工作流和为什么提示词控不住运镜，以及如何用白模彻底解决.
 
