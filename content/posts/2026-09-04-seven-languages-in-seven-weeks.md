@@ -125,3 +125,5 @@ Prolog 是一种逻辑编程语言，由 Alain Colmerauer 和 Philippe Roussel �
 - 规则
 - 提问
 
+[扩展学习](https://www.bilibili.com/video/BV1Lcum6nEqm/?spm_id_from=333.337.search-card.all.click&vd_source=a13f2954ac6222672a2f6b476785eb91)
+
