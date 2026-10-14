@@ -125,5 +125,7 @@ Prolog 是一种逻辑编程语言，由 Alain Colmerauer 和 Philippe Roussel �
 - 规则
 - 提问
 
-[扩展学习](https://www.bilibili.com/video/BV1Lcum6nEqm/?spm_id_from=333.337.search-card.all.click&vd_source=a13f2954ac6222672a2f6b476785eb91)
+逻辑式编程是声明式的范式：命令式程序写"怎么做"——用赋值和时序指令改变可变状态；逻辑式程序只写"什么成立"——用事实（fact）和规则（rule）声明关系，把求解交给引擎。程序分知识库与查询（query）两部分，声明与求值分离；知识库在逻辑上无顺序，但引擎按固定策略搜索。引擎靠两个机制运转：统一（unification）——把变量当作不可变的未知数，通过双向绑定让表达式相等，同一变量必须处处一致；回溯（backtracking）——深度优先搜索，失败时退回最近的选择点换路。因变量不可变，逻辑式没有循环，递归是唯一的重复手段；因规则只是声明，故关系没有输入输出方向、天然可逆。它适合关系、约束与搜索问题，不适合要求精确控制执行顺序或大量副作用的任务——判断标是：问题由关系主导，还是由过程主导。
+
+- [扩展学习](https://www.bilibili.com/video/BV1Lcum6nEqm/?spm_id_from=333.337.search-card.all.click&vd_source=a13f2954ac6222672a2f6b476785eb91)
 
